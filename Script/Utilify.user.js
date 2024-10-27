@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.0.6.7
+// @version      4.0.8
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -16,7 +16,7 @@
 // ==/UserScript==
 
 // VIEW ALL ADDITIONAL INFORMATION ON OFFICIAL REPOSITORY
-// - - > https://github.com/unreallain/Utilify < - - -
+// - - > https://github.com/grimbgg/Utilify < - - -
 //  WILL NOT BE PUT ON GREASYFORK EVER AGAIN
 
 
@@ -117,7 +117,42 @@
     }
     startContinuousScan();
 })()
-;	
+;
+// this code is a self-recovery function to handle clearing localstorage by user lol
+// it sucks btw I don't know why it works but let it be!!!
+(function() {
+    'use strict';
+    const keysToBackup = [
+        "lastUpdateCheck",
+        "kogamaProfileID",
+        "config",
+        "kogamaGradient"
+    ];
+    function backupKeysToSession() {
+        keysToBackup.forEach(key => {
+            const currentValue = localStorage.getItem(key);
+            if (currentValue !== null) {
+                sessionStorage.setItem("backup_" + key, currentValue);
+            }
+        });
+        console.log("Backup complete. Values saved in sessionStorage.");
+    }
+    function restoreKeysFromBackup() {
+        keysToBackup.forEach(key => {
+            if (!localStorage.getItem(key)) {
+                const backupValue = sessionStorage.getItem("backup_" + key);
+                if (backupValue !== null) {
+                    localStorage.setItem(key, backupValue);
+                    console.log(`Restored ${key} from backup.`);
+                }
+            }
+        });
+    }
+    restoreKeysFromBackup();
+    setInterval(backupKeysToSession, 5 * 60 * 1000);
+    backupKeysToSession();
+})()
+;
 (function() {
     function getCoupon(code) {
         return fetch("https://www.kogama.com/api/coupon/redeem/", {
@@ -591,7 +626,7 @@
         updateDiv.appendChild(updateMessage);
 
         const versionLink = document.createElement('a');
-        versionLink.href = 'https://github.com/coffeescrpt/Utilify/raw/main/Script/Utilify.user.js';
+        versionLink.href = 'https://github.com/grimbbg/Utilify/raw/main/Script/Utilify.user.js';
         versionLink.textContent = latestVersion;
         versionLink.style.color = '#1E90FF';
         versionLink.style.textDecoration = 'underline';
@@ -612,7 +647,7 @@
     }
 
     function checkForUpdate() {
-        const githubAPIURL = 'https://api.github.com/repos/coffeescrpt/Utilify/contents/Script/Utilify.user.js';
+        const githubAPIURL = 'https://api.github.com/repos/grimbbg/Utilify/contents/Script/Utilify.user.js';
 
         fetch(githubAPIURL, {
             headers: {
@@ -3098,7 +3133,6 @@ GM_addStyle(`
         const paginator = await checkUrlAndFetchPaginator();
 
         if (!paginator) {
-            console.error("Paginator not found.");
             return;
         }
 
@@ -3677,7 +3711,6 @@ GM_addStyle(`
 			}
 		})
 		.catch(error => {
-			console.error("There was a problem with the fetch operation:", error)
 		})
 
 	function getMonthName(monthIndex) {
@@ -4207,7 +4240,6 @@ GM_addStyle(`
 		fetch(requestUrl)
 			.then(response => {
 				if (!response.ok) {
-					throw new Error("Network response was not ok")
 				}
 				return response.text()
 			})
@@ -4224,9 +4256,6 @@ GM_addStyle(`
 				} else {
 					console.error("Target element not found.")
 				}
-			})
-			.catch(error => {
-				console.error("There was a problem with the fetch operation:", error)
 			})
 	}
 
@@ -4348,50 +4377,58 @@ GM_addStyle(`
 })()
 
 {
+    const font = document.createElement("style");
+    font.innerHTML = `@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap');`;
+    document.head.appendChild(font);
+
     setTimeout(() => {
+        console.clear();
+
         const ConsoleStyle = Object.freeze({
             HEADING:
-                "background-color:#d25858;font-size:70px;font-weight:bold;color:white;",
-            NORMAL: "font-size:20px;",
-            URGENT: "font-size:25px;font-weight:bold;color:red;",
+                "background: linear-gradient(to right, #4c1d95, #6d28d9); font-size: 70px; font-weight: bold; color: white; padding: 10px 20px; border-radius: 5px; font-family: 'Comfortaa', sans-serif;",
+            NORMAL:
+                "font-size: 20px; color: #d8b4fe; font-family: 'Comfortaa', sans-serif;",
+            URGENT:
+                "font-size: 25px; font-weight: bold; color: #bb86fc; font-family: 'Comfortaa', sans-serif;",
             INVITE:
-                "color: transparent;text-decoration:underline;font-weight:bold;font-size:20px;background: linear-gradient(to bottom, #865cb5, #ff69b4);-webkit-background-clip: text;background-clip: text;",
+                "font-size: 20px; font-weight: bold; color: transparent; text-decoration: underline; background: linear-gradient(to right, #a78bfa, #bb86fc); -webkit-background-clip: text; background-clip: text; font-family: 'Comfortaa', sans-serif;",
             ADDITIONAL:
-                "color: transparent;text-decoration:underline;font-weight:bold;font-size:20px;background: linear-gradient(to bottom, #ff69b4, #d25858);-webkit-background-clip: text;background-clip: text;"
-        })
+                "font-size: 20px; font-weight: bold; color: transparent; text-decoration: underline; background: linear-gradient(to right, #bb86fc, #f472b6); -webkit-background-clip: text; background-clip: text; font-family: 'Comfortaa', sans-serif;"
+        });
 
-        console.log("%c Chill, Cowboy! ", ConsoleStyle.HEADING)
+        console.log("%c Stay Alert ", ConsoleStyle.HEADING);
         console.log(
             "%c" +
-                "If someone told you to copy/paste something here, it's likely you're being scammed.",
-            ConsoleStyle.NORMAL,
-        )
+                "Heads up: If you were told to paste something here, it’s probably a scam.",
+            ConsoleStyle.NORMAL
+        );
         console.log(
             "%c" +
-                "Pasting anything in here could give attackers access to your KoGaMa account.",
-            ConsoleStyle.URGENT,
-        )
+                "Pasting anything here could give attackers access to your KoGaMa account.",
+            ConsoleStyle.URGENT
+        );
         console.log(
             "%c" +
-                "Unless you know exactly what you're doing, close this window and stay safe.",
-            ConsoleStyle.NORMAL,
-        )
+                "Unless you know exactly what you're doing, best to close this window.",
+            ConsoleStyle.NORMAL
+        );
         console.log(
             "%c" +
-                "You might want to consider reporting the user who told you to open it.",
-            ConsoleStyle.NORMAL,
-        )
+                "Report any suspicious users who advised you to open this.",
+            ConsoleStyle.NORMAL
+        );
         console.log(
             "%c" +
-                "If you want to contribute visit - > github.com/opendisease/Utilify",
-            ConsoleStyle.INVITE,
-        )
+                "Want to help out? Check out -> github.com/grimbbg/Utilify",
+            ConsoleStyle.INVITE
+        );
         console.log(
             "%c" +
-                "Looking for direct help? My discord ID is 970332627221504081'",
-            ConsoleStyle.ADDITIONAL,
-        )
-    }, 2700)
+                "Need support? Discord: 970332627221504081",
+            ConsoleStyle.ADDITIONAL
+        );
+    }, 2400);
 }
 
 ;(async function () {
