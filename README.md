@@ -13,6 +13,11 @@ On top of porting KoGaMaBuddy's features it also adds countless new and never-se
 
 <br>
 
+> [!TIP]
+> Looking for suppor regarding Utilify? Trying to suggest a new feature? <br>
+> Feel welcome to join [our discord community](discord.gg/C2ZJCZXKTu) or add me directly @ [grimbbg](https://www.kogama.com/profile/670259371/)
+
+
 > [!NOTE]
 > <h2>Utilify Contributors</h2>
 > <p>
@@ -41,7 +46,6 @@ On top of porting KoGaMaBuddy's features it also adds countless new and never-se
 > 
 > Please remember to stay safe and absolutely never try scripts that you don't understand or don't know origin of.<br>
 > The only <b>safe place</b> to actually get Utilify from is only <a href="https://github.com/unreallain/Utilify/">this github respository</a>.<br>
-> Due previously mentioned issue Utilify is only available on github.<br>
 > Never trust optional sources if you value your privacy.<br>
 > [<img src="Modules/img/features.png" width="200"/>](https://github.com/grimbbg/Utilify/blob/main/Modules/README.md) <br>
 > [<img src="Modules/img/download.png" width="200"/>](https://github.com/unreallain/Utilify/raw/main/Script/Utilify.user.js) 
