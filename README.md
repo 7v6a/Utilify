@@ -48,5 +48,5 @@ On top of porting KoGaMaBuddy's features it also adds countless new and never-se
 > The only <b>safe place</b> to actually get Utilify from is only <a href="https://github.com/unreallain/Utilify/">this github respository</a>.<br>
 > Due previously mentioned issue Utilify is only available on github.<br>
 > Never trust optional sources if you value your privacy.<br>
-> [<img src="Modules/img/features.png" width="200"/>](https://github.com/unreallain/Utilify/blob/main/Modules/features.json) <br>
+> [<img src="Modules/img/features.png" width="200"/>](https://github.com/grimbbg/Utilify/blob/main/Modules/README.md) <br>
 > [<img src="Modules/img/download.png" width="200"/>](https://github.com/unreallain/Utilify/raw/main/Script/Utilify.user.js) 
