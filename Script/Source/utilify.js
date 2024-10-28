@@ -2524,6 +2524,14 @@ GM_addStyle(`
             <br><br>
             <ufc>ViewDMLog:</ufc> Allows you to export message log of direct chats (dms).
             <br><br>
+	    <ufc>SelfRecover:</ufc> Automatically recovers lost keys (gradient ; accounts and so on) when you clear localStorage.
+            <br><br>
+	    <ufc>ExportImportConfig:</ufc> Allows you to easily export and import config settings (fonts; gradient; accounts saved)
+            <br><br>
+	    <ufc>WhatActivity:</ufc> KoGaMaBuddy's port -> displays what other people are playing / building.
+            <br><br>
+	    <ufc>ProjectManipulation:</ufc> Allows you to quickly deal with  project invities and projects you belong to.
+            <br><br>
         </p>
         `;
         document.body.appendChild(featuresPage);
