@@ -29,13 +29,8 @@ On top of porting KoGaMaBuddy's features it also adds countless new and never-se
 > [!CAUTION]
 > <h2>Read Before Using</h2>
 > <p>
->  A lot of my friends have been banned and flagged for alleged cheating when using Utilify.<br>
-> This should be considered a warning about usage of scripts and extensions for the website, no matter what they offer they can bring consequences.
-> <b>STAY SAFE</b><br>
-> <img src="Modules/img/shouldbefine.png"> <br>
-> </p>
->  I do not have an actual permission to use this screenshot: If you are not comfortable with me using it please let me know. <br>
-> <br>
+> This script relies on javascript executor, which are often distrusted. <br>
+> My loader of choice is tampermonkey, visit their website to install it below: <br>
 >
 > [<img src="Modules/img/tmonk.png" width="260"/>](https://www.tampermonkey.net/) <br>
 
