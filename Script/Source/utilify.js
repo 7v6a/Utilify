@@ -4372,7 +4372,6 @@ GM_addStyle(`
         return regex.test(gradient)
     }
 })()
-
 ;
 (function() {
     "use strict";
@@ -4424,7 +4423,7 @@ GM_addStyle(`
             styleSheet.innerText = styles;
             document.head.appendChild(styleSheet);
             copyButton.addEventListener("click", function() {
-                var descriptionText = getDescriptionRawText(descriptionDiv) + "\n";
+                var descriptionText = getDescriptionTextOnly(descriptionDiv) + "\n";
                 copyToClipboard(descriptionText);
                 showCustomNotification("Description copied to clipboard!");
             });
@@ -4432,8 +4431,11 @@ GM_addStyle(`
         }
     }
 
-    function getDescriptionRawText(descriptionDiv) {
-        return descriptionDiv.innerText;
+    function getDescriptionTextOnly(descriptionDiv) {
+        return Array.from(descriptionDiv.childNodes)
+            .filter(node => node.nodeType === Node.TEXT_NODE)
+            .map(node => node.textContent.trim())
+            .join(" ");
     }
 
     function copyToClipboard(text) {
@@ -4473,7 +4475,8 @@ GM_addStyle(`
 
     window.addEventListener("load", addCopyButton);
 })()
-;(function () {
+;
+(function () {
 	"use strict"
 
 	function init() {
