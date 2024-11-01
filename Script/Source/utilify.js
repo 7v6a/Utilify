@@ -1,4 +1,4 @@
-// realistic version of code: v4.1.4c 
+// realistic version of code: v4.1.4stable
 
 (function() {
     'use strict';
@@ -5371,6 +5371,7 @@ const injectCss = (id, css) => {
     }
     updateTitle();
 })();
+
 (function() {
     "use strict";
 
@@ -5392,22 +5393,22 @@ const injectCss = (id, css) => {
         const configMenu = document.createElement("div");
         configMenu.className = "config-menu";
         configMenu.style.cssText = `
-        width: 480px;
-        height: 460px;
-        padding: 20px;
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 10px;
-        backdrop-filter: blur(10px);
-        color: #fff;
-        font-family: Arial, sans-serif;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1000;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        overflow-y: auto;
-    `;
+            width: 480px;
+            height: 460px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            color: #fff;
+            font-family: Arial, sans-serif;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        `;
 
         const privacyCategory = createCategory("Privacy", [{
             label: "Blur Sensitive Content",
@@ -5430,6 +5431,10 @@ const injectCss = (id, css) => {
         }]);
 
         const experimentalCategory = createCategory("EXPERIMENTAL", [{
+            label: "Disable Activity Status",
+            key: "activityBlocker",
+            callback: applyActivityBlockerSetting
+        }, {
             label: "Disable Animations (Might not work as expected)",
             key: "disableAnimations",
             callback: applyDisableAnimationsSetting
@@ -5455,11 +5460,11 @@ const injectCss = (id, css) => {
         const categoryLabel = document.createElement("div");
         categoryLabel.textContent = title;
         categoryLabel.style.cssText = `
-        font-size: 18px;
-        margin-bottom: 10px;
-        border-bottom: 1px solid rgba(186, 104, 200, 0.5);
-        padding-bottom: 5px;
-    `;
+            font-size: 18px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(186, 104, 200, 0.5);
+            padding-bottom: 5px;
+        `;
         category.appendChild(categoryLabel);
 
         settings.forEach(setting => {
@@ -5474,10 +5479,10 @@ const injectCss = (id, css) => {
         const checkboxContainer = document.createElement("div");
         checkboxContainer.className = "checkbox-container";
         checkboxContainer.style.cssText = `
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    `;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        `;
 
         const checkboxInput = document.createElement("input");
         checkboxInput.type = "checkbox";
@@ -5490,14 +5495,13 @@ const injectCss = (id, css) => {
         const checkboxLabel = document.createElement("label");
         checkboxLabel.textContent = label;
         checkboxLabel.style.cssText = `
-        margin-left: 10px;
-        font-size: 14px;
-    `;
+            margin-left: 10px;
+            font-size: 14px;
+        `;
         checkboxContainer.appendChild(checkboxInput);
         checkboxContainer.appendChild(checkboxLabel);
         return checkboxContainer;
     }
-
 
     function createFontCategory() {
         const fontCategory = document.createElement("div");
@@ -5573,7 +5577,22 @@ const injectCss = (id, css) => {
         applyBadgeSettings();
         applyFontSetting(getConfigValue("customFont"));
         applyHideFriendsListSetting(getConfigValue("hideFriendsList"));
+        applyActivityBlockerSetting(getConfigValue("activityBlocker"));
         applyDisableAnimationsSetting(getConfigValue("disableAnimations"));
+    }
+
+    function applyActivityBlockerSetting(isEnabled) {
+        const originalOpen = XMLHttpRequest.prototype.open;
+        if (isEnabled) {
+            XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+                if (method === 'POST' && /https:\/\/www\.kogama\.com\/user\/\d+\/pulse\//.test(url)) {
+                    return;
+                }
+                originalOpen.apply(this, arguments);
+            };
+        } else {
+            XMLHttpRequest.prototype.open = originalOpen;
+        }
     }
 
     function applyBadgeSettings() {
@@ -5682,9 +5701,8 @@ const injectCss = (id, css) => {
     }
 
 })()
-
-
-;(function() {
+;
+(function() {
     'use strict';
 
     var targetClassNames = ['HkJ09', '_21GhQ', '_2Xkij'];
