@@ -1,4 +1,4 @@
-// realistic version of code: v4.1.1b 
+// realistic version of code: v4.1.4c 
 
 (function() {
     'use strict';
@@ -3139,52 +3139,53 @@ GM_addStyle(`
 
     waitForElements('input.MuiInputBase-input.MuiFilledInput-input', addPasswordGeneratorUI);
 })();
+// This part will get deleted soon, I was way too sassy over kogama, lmfao. -s
+// (function() {
+//     'use strict';
+//     const restrictedUrls = [
+//         "https://www.kogama.com/profile/668970496/*",
+//         "https://www.kogama.com/profile/22217990/*",
+//         "https://www.kogama.com/profile/670033029/*"
+//     ];
+// 
+//     function isRestrictedUrl(url) {
+//         return restrictedUrls.some(restrictedUrl => {
+//             const regex = new RegExp(restrictedUrl.replace(/\*/g, '.*'));
+//             return regex.test(url);
+//         });
+//     }
+//     function restrictContent() {
+//         document.body.innerHTML = '';
+//         const style = document.createElement('style');
+//         style.textContent = `
+//             @font-face {
+//                 font-family: 'IBMPlexSerif';
+//                 src: url('https://cdn.jsdelivr.net/gh/IBM/plex@master/packages/plex-serif/fonts/complete/woff2/IBMPlexSerif-Medium.woff2') format('woff2');
+//                 font-weight: 500;
+//                 font-style: normal;
+//                 font-display: swap;
+//             }
+//             body {
+//                 background-color: black;
+//                 color: white;
+//                 font-family: 'IBMPlexSerif', serif;
+//                 font-size: 36px;
+//                 text-align: center;
+//                 margin-top: 20%;
+//             }
+//         `;
+//         document.head.appendChild(style);
+//         const message = document.createElement('div');
+//         message.textContent = 'CONTENT RESTRICTION';
+//         document.body.appendChild(message);
+//     }
+// 
+//     if (isRestrictedUrl(window.location.href)) {
+//         restrictContent();
+//     }
+// 
+// })()
 
-(function() {
-    'use strict';
-    const restrictedUrls = [
-        "https://www.kogama.com/profile/668970496/*",
-        "https://www.kogama.com/profile/22217990/*",
-        "https://www.kogama.com/profile/670033029/*"
-    ];
-
-    function isRestrictedUrl(url) {
-        return restrictedUrls.some(restrictedUrl => {
-            const regex = new RegExp(restrictedUrl.replace(/\*/g, '.*'));
-            return regex.test(url);
-        });
-    }
-    function restrictContent() {
-        document.body.innerHTML = '';
-        const style = document.createElement('style');
-        style.textContent = `
-            @font-face {
-                font-family: 'IBMPlexSerif';
-                src: url('https://cdn.jsdelivr.net/gh/IBM/plex@master/packages/plex-serif/fonts/complete/woff2/IBMPlexSerif-Medium.woff2') format('woff2');
-                font-weight: 500;
-                font-style: normal;
-                font-display: swap;
-            }
-            body {
-                background-color: black;
-                color: white;
-                font-family: 'IBMPlexSerif', serif;
-                font-size: 36px;
-                text-align: center;
-                margin-top: 20%;
-            }
-        `;
-        document.head.appendChild(style);
-        const message = document.createElement('div');
-        message.textContent = 'CONTENT RESTRICTION';
-        document.body.appendChild(message);
-    }
-
-    if (isRestrictedUrl(window.location.href)) {
-        restrictContent();
-    }
-
-})()
 ;(async () => {
     "use strict";
     function injectModalStyles() {
@@ -5196,7 +5197,7 @@ const injectCss = (id, css) => {
                             }
                         }
                     } catch (e) {
-                        // Optionally handle JSON parsing errors here
+                        // handle for json parse issues should be here but ion give a f at this point.
                     }
                 }
             });
@@ -5370,7 +5371,7 @@ const injectCss = (id, css) => {
     }
     updateTitle();
 })();
-(function () {
+(function() {
     "use strict";
 
     const CONFIG_KEY = "config";
@@ -5381,11 +5382,9 @@ const injectCss = (id, css) => {
         "Comfortaa", 'IBMPlexMono'
     ];
 
-    // Check if we're on the config page
     if (window.location.pathname.endsWith('/config')) {
         createConfigMenu();
     } else {
-        // Apply settings based on saved config
         applySettingsFromConfig();
     }
 
@@ -5393,42 +5392,58 @@ const injectCss = (id, css) => {
         const configMenu = document.createElement("div");
         configMenu.className = "config-menu";
         configMenu.style.cssText = `
-            width: 300px;
-            height: 400px;
-            padding: 20px;
-            background: rgba(186, 104, 200, 0.4);
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            color: #fff;
-            font-family: Arial, sans-serif;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            overflow-y: auto;
-        `;
+        width: 480px;
+        height: 460px;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        color: #fff;
+        font-family: Arial, sans-serif;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        overflow-y: auto;
+    `;
 
-        const privacyCategory = createCategory("Privacy", [
-            { label: "Blur Sensitive Content", key: "blurSensitiveContents", callback: applyBlurSetting }
-        ]);
+        const privacyCategory = createCategory("Privacy", [{
+            label: "Blur Sensitive Content",
+            key: "blurSensitiveContents",
+            callback: applyBlurSetting
+        }, {
+            label: "Hide Friends List",
+            key: "hideFriendsList",
+            callback: applyHideFriendsListSetting
+        }]);
 
-        const profilesCategory = createCategory("Profiles", [
-            { label: "Disable Hidden Badges", key: "disableHiddenBadges", callback: applyBadgeSettings },
-            { label: "Disable All Badges", key: "disableAllBadges", callback: applyBadgeSettings },
-            { label: "Hide Friends List", key: "hideFriendsList", callback: applyHideFriendsListSetting }
-        ]);
+        const profilesCategory = createCategory("Profiles", [{
+            label: "Disable Hidden Badges",
+            key: "disableHiddenBadges",
+            callback: applyBadgeSettings
+        }, {
+            label: "Disable All Badges",
+            key: "disableAllBadges",
+            callback: applyBadgeSettings
+        }]);
+
+        const experimentalCategory = createCategory("EXPERIMENTAL", [{
+            label: "Disable Animations (Might not work as expected)",
+            key: "disableAnimations",
+            callback: applyDisableAnimationsSetting
+        }]);
 
         const fontCategory = createFontCategory();
 
         configMenu.appendChild(privacyCategory);
         configMenu.appendChild(profilesCategory);
+        configMenu.appendChild(experimentalCategory);
         configMenu.appendChild(fontCategory);
 
         document.body.appendChild(configMenu);
 
-        // Apply settings from saved config
         applySettingsFromConfig();
     }
 
@@ -5440,57 +5455,49 @@ const injectCss = (id, css) => {
         const categoryLabel = document.createElement("div");
         categoryLabel.textContent = title;
         categoryLabel.style.cssText = `
-            font-size: 18px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(186, 104, 200, 0.5);
-            padding-bottom: 5px;
-        `;
+        font-size: 18px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(186, 104, 200, 0.5);
+        padding-bottom: 5px;
+    `;
         category.appendChild(categoryLabel);
 
         settings.forEach(setting => {
-            const settingLabel = document.createElement("div");
-            settingLabel.textContent = setting.label;
-            settingLabel.style.marginBottom = "10px";
-
-            const settingControl = createCheckbox(setting.key, setting.callback);
-
-            category.appendChild(settingLabel);
+            const settingControl = createCheckbox(setting.key, setting.callback, setting.label);
             category.appendChild(settingControl);
         });
 
         return category;
     }
 
-    function createCheckbox(key, callback) {
+    function createCheckbox(key, callback, label) {
         const checkboxContainer = document.createElement("div");
         checkboxContainer.className = "checkbox-container";
         checkboxContainer.style.cssText = `
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        `;
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    `;
 
         const checkboxInput = document.createElement("input");
         checkboxInput.type = "checkbox";
         checkboxInput.checked = getConfigValue(key);
-        checkboxInput.addEventListener("change", function () {
+        checkboxInput.addEventListener("change", function() {
             const isEnabled = checkboxInput.checked;
             setConfigValue(key, isEnabled);
             callback(isEnabled);
         });
-
         const checkboxLabel = document.createElement("label");
-        checkboxLabel.textContent = key.replace(/([A-Z])/g, " $1").trim();
+        checkboxLabel.textContent = label;
         checkboxLabel.style.cssText = `
-            margin-left: 10px;
-            font-size: 14px;
-        `;
-
+        margin-left: 10px;
+        font-size: 14px;
+    `;
         checkboxContainer.appendChild(checkboxInput);
         checkboxContainer.appendChild(checkboxLabel);
-
         return checkboxContainer;
     }
+
 
     function createFontCategory() {
         const fontCategory = document.createElement("div");
@@ -5536,7 +5543,7 @@ const injectCss = (id, css) => {
             fontSelect.appendChild(option);
         });
         fontSelect.value = getConfigValue("customFont") || "";
-        fontSelect.addEventListener("change", function () {
+        fontSelect.addEventListener("change", function() {
             const fontName = fontSelect.value;
             setConfigValue("customFont", fontName);
             applyFontSetting(fontName);
@@ -5562,15 +5569,14 @@ const injectCss = (id, css) => {
     }
 
     function applySettingsFromConfig() {
-        // Ensure settings are applied correctly
         applyBlurSetting(getConfigValue("blurSensitiveContents"));
         applyBadgeSettings();
         applyFontSetting(getConfigValue("customFont"));
         applyHideFriendsListSetting(getConfigValue("hideFriendsList"));
+        applyDisableAnimationsSetting(getConfigValue("disableAnimations"));
     }
 
     function applyBadgeSettings() {
-        // Check badge settings and apply them
         const disableHiddenBadges = getConfigValue("disableHiddenBadges");
         const disableAllBadges = getConfigValue("disableAllBadges");
 
@@ -5598,7 +5604,7 @@ const injectCss = (id, css) => {
             .MuiFilledInput-inputMarginDense:active,
             .MuiSelect-select.MuiSelect-select:active,
             ._13UrL .kR267 ._9smi2 ._1rJI8:active {
-                filter: none; /* Remove blur on hover and active states */
+                filter: none;
             }
         `);
     }
@@ -5640,7 +5646,42 @@ const injectCss = (id, css) => {
         `);
     }
 
+    function applyDisableAnimationsSetting(isEnabled) {
+        if (isEnabled) {
+            disableAnimations();
+        }
+    }
 
+    function disableAnimations() {
+        const animationClasses = ['fade', 'slide', 'bounce', 'zoom'];
+        GM_addStyle(`
+            * {
+                transition: none !important;
+                animation: none !important;
+                animation-duration: 0s !important;
+                animation-delay: 0s !important;
+                animation-fill-mode: none !important;
+                will-change: auto !important;
+            }
+        `);
+        document.querySelectorAll('*').forEach(el => {
+            el.style.transition = 'none';
+            el.style.animation = 'none';
+            animationClasses.forEach(cls => {
+                el.classList.remove(cls);
+            });
+        });
+
+        const observer = new MutationObserver(() => {
+            disableAnimations();
+        });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+})()
 
 
 ;(function() {
