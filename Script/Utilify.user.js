@@ -13,9 +13,10 @@
 // @connect      kogama.com.br
 // @connect      kogama.com
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
+// @icon         https://i.imgur.com/hG5QwIl.gif
 // ==/UserScript==
 
-// Stable release: 4.1.5a | Stable | bug_fixes
+// Stable release
 // Reverted @require from github because it did not work as well for updates, I'm sorry about that.
 (function() {
     'use strict';
