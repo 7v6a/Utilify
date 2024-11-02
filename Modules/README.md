@@ -28,7 +28,7 @@
 
 - **KoGaMaBuddy Emojis:** Restores KoGaMaBuddy emojis. <br>
   ```
-  Start typing : to view available emoji menu
+  Start typing with : to view available emoji menu
   ```
 
 - **Preview Marketplace Images:** View larger previews of items from the marketplace.
