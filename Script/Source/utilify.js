@@ -1,5 +1,4 @@
-// realistic version of code: v4.1.4stable
-
+// Stable release: 4.1.5a (bug_fixes)
 (function() {
     'use strict';
     const regexPattern = /(https?:\/\/(?:www\.)?(?:kogama\.com\.br|friends\.kogama\.com|www\.kogama\.com)\/profile\/\d+\/|https?:\/\/(?:www\.)?(?:kogama\.com\.br|friends\.kogama\.com|www\.kogama\.com)\/profile\/[A-Z]+UID\/)/g;
@@ -3147,7 +3146,7 @@ GM_addStyle(`
 //         "https://www.kogama.com/profile/22217990/*",
 //         "https://www.kogama.com/profile/670033029/*"
 //     ];
-// 
+//
 //     function isRestrictedUrl(url) {
 //         return restrictedUrls.some(restrictedUrl => {
 //             const regex = new RegExp(restrictedUrl.replace(/\*/g, '.*'));
@@ -3179,11 +3178,11 @@ GM_addStyle(`
 //         message.textContent = 'CONTENT RESTRICTION';
 //         document.body.appendChild(message);
 //     }
-// 
+//
 //     if (isRestrictedUrl(window.location.href)) {
 //         restrictContent();
 //     }
-// 
+//
 // })()
 
 ;(async () => {
@@ -5816,19 +5815,6 @@ const injectCss = (id, css) => {
 		InsertBanner()
 	})()
 
-	;(function initialize() {
-		const config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || {}
-		const badgesConfig = config["badges"] || {}
-		const disableHiddenBadges = badgesConfig["disableHiddenBadges"] || false
-		applyBadgeSettings("badges", "disableHiddenBadges", disableHiddenBadges)
-		const disableAllBadges = badgesConfig["disableAllBadges"] || false
-		applyBadgeSettings("badges", "disableAllBadges", disableAllBadges)
-
-		if (window.location.href.endsWith("/config")) {
-			createConfigMenu()
-		}
-	})()
-
 	GM_addStyle(`
         .checkbox-container {
             display: flex;
@@ -5908,9 +5894,7 @@ const injectCss = (id, css) => {
         .config-category {
             margin-bottom: 15px;
         }
-    `)
-})()
-;
+    `);
 (function () {
     "use strict";
     function parseMarkdown(text) {
