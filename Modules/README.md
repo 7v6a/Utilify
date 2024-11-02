@@ -46,7 +46,9 @@
 - **User Backgrounds:** Set KoGaMaBuddy user-profile backgrounds with custom filters that can be chained with each other.
   ```
    Background:GAMEID,filter:PROPERTY; 
-   Background:11019613,filter:meteorshower, rain; 
+   Background:11019613,filter:meteorshower, rain;
+
+   - - > Available properties: haze, starlight, aurora, firely, snow, rain, meteorshower, blur, dark, light, none
   ```
 
 - **User Gradients:** Assign a global gradient to your profile using gradient data in your description.
