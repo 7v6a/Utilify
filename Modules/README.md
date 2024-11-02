@@ -23,6 +23,12 @@
 - **Find User Avatars:** Searches for specific avatars that users may have.
 
 - **Fix ThisHTML:** Resolves description-related issues with symbols.
+  ```
+  Fixes characters such as ; ' "  when editing description to minimalize user input.
+  Soon to be fixed as well < >
+  - - > If you find more broken characters, let me know as soon as possible
+  ```
+
 
 - **Get Image Strokes Away:** Provides a transparent background for avatar previews.
 
