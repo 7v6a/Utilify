@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.1.5a
+// @version      4.1.6
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -3287,6 +3287,7 @@ GM_addStyle(`
 
 ;(async () => {
     "use strict";
+
     function injectModalStyles() {
         const style = document.createElement('style');
         style.textContent = `
@@ -3296,14 +3297,14 @@ GM_addStyle(`
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.8); /* Darker background */
+                background: rgba(0, 0, 0, 0.8);
                 display: none;
                 z-index: 1000;
                 align-items: center;
                 justify-content: center;
             }
             .custom-modal-content {
-                background: #333; /* Dark background for modal content */
+                background: #333;
                 padding: 20px;
                 border-radius: 10px;
                 max-width: 80%;
@@ -3313,7 +3314,7 @@ GM_addStyle(`
                 box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
                 position: relative;
                 overflow: hidden;
-                color: #fff; /* White text for contrast */
+                color: #fff;
             }
             .custom-modal-close {
                 position: absolute;
@@ -3321,43 +3322,43 @@ GM_addStyle(`
                 right: 10px;
                 cursor: pointer;
                 font-size: 24px;
-                color: #fff; /* White close button */
+                color: #fff;
             }
             .modal-input {
                 width: 100%;
                 padding: 10px;
                 margin-bottom: 10px;
-                background: #555; /* Dark input background */
+                background: #555;
                 border: 1px solid #666;
-                color: #fff; /* White text for input */
+                color: #fff;
             }
             .custom-list {
                 list-style-type: none;
                 padding: 0;
                 margin: 0;
                 display: grid;
-                grid-template-columns: 1fr 1fr; /* Two columns */
-                gap: 10px; /* Space between columns */
-                height: calc(100% - 80px); /* Height of the list */
-                overflow-y: auto; /* Scroll when content overflows */
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                height: calc(100% - 80px);
+                overflow-y: auto;
             }
             .custom-list li {
-                background: #444; /* Dark background for list items */
+                background: #444;
                 padding: 10px;
                 border-radius: 5px;
                 box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
             }
             .custom-list a {
-                color: #eee; /* Light text color for links */
+                color: #eee;
                 text-decoration: none;
                 display: block;
                 transition: color 0.3s, text-shadow 0.3s;
             }
             .custom-list a.special-glow {
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8); /* Soft glow effect */
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
             }
             .custom-list a:hover {
-                color: #fff; /* Brighten on hover */
+                color: #fff;
             }
         `;
         document.head.appendChild(style);
@@ -3405,11 +3406,7 @@ GM_addStyle(`
             listItems.forEach(item => {
                 const link = item.querySelector("a");
                 const itemName = link.textContent.toLowerCase();
-                if (itemName.includes(searchText)) {
-                    item.style.display = "block";
-                } else {
-                    item.style.display = "none";
-                }
+                item.style.display = itemName.includes(searchText) ? "block" : "none";
             });
         });
     }
@@ -3476,6 +3473,7 @@ GM_addStyle(`
         const paginator = await checkUrlAndFetchPaginator();
 
         if (!paginator) {
+            console.error("Paginator not found.");
             return;
         }
 
@@ -3495,11 +3493,13 @@ GM_addStyle(`
         }
 
         const elementList = document.getElementById("elementList");
-        const userId = getUserIdFromBootstrap();
+        const userId = extractUserId();
         if (!userId) {
             console.error("User ID not found.");
             return;
         }
+
+        console.log("User ID fetched: ", userId);
 
         const fetchPromises = [];
         for (let i = 1; i <= totalPages; i++) {
@@ -3523,6 +3523,7 @@ GM_addStyle(`
                     }
                 });
             });
+            console.log("Page data processed successfully.");
         } catch (error) {
             console.error("Error fetching page data:", error);
         }
@@ -3545,26 +3546,30 @@ GM_addStyle(`
             }
         });
     }
+    function extractUserId() {
+        const scripts = document.querySelectorAll('script');
 
-    function getUserIdFromBootstrap() {
-        const scriptTags = document.getElementsByTagName('script');
-        for (let script of scriptTags) {
-            const innerContent = script.innerHTML;
-            const userMatch = innerContent.match(/"current_user":\s*{.*?"id":\s*(\d+)/);
-            if (userMatch && userMatch[1]) {
-                return userMatch[1];
+        for (let script of scripts) {
+            if (script.textContent.includes('"current_user":')) {
+                const regex = /"id":\s*(\d+)/;
+                const match = script.textContent.match(regex);
+
+                if (match) {
+                    const userId = match[1];
+                    console.log(`User ID found: ${userId}`);
+                    return userId;
+                }
             }
         }
+
+        console.log('User ID not found.');
         return null;
     }
 
     injectModalStyles();
     waitForElement();
-    processPageData();
-})();
-
-
-
+    setTimeout(processPageData, 3000);
+})()
 ;(function () {
 	"use strict"
 
