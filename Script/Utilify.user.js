@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.1.6
+// @version      4.1.7
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -16,7 +16,7 @@
 // @icon         https://i.imgur.com/hG5QwIl.gif
 // ==/UserScript==
 
-// Stable release
+// Stable release: Shiggy + bug fixes
 // Reverted @require from github because it did not work as well for updates, I'm sorry about that.
 (function() {
     'use strict';
@@ -5237,7 +5237,27 @@ GM_addStyle(`
 
     InsertBeforeLoad();
 })();
+
 (function() {
+    'use strict';
+
+    function replaceImageAndTooltip() {
+        const targetElement = document.querySelector('div._2Jlgl a');
+
+        if (targetElement) {
+            const newImageUrl = 'https://i.imgur.com/hG5QwIl.gif';
+            const imgElement = targetElement.querySelector('img');
+            if (imgElement) {
+                imgElement.src = newImageUrl;
+                imgElement.srcset = newImageUrl + ' 2x';
+            }
+            const newTooltipText = 'Utilify Client';
+            targetElement.setAttribute('title', newTooltipText);
+        }
+    }
+    window.addEventListener('load', replaceImageAndTooltip);
+})()
+;(function() {
     'use strict';
     function hideMenuItems() {
         const menuItemsToHide = [
