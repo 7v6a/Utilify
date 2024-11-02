@@ -26,7 +26,10 @@
 
 - **Get Image Strokes Away:** Provides a transparent background for avatar previews.
 
-- **KoGaMaBuddy Emojis:** Restores KoGaMaBuddy emojis; type `:` to see the list.
+- **KoGaMaBuddy Emojis:** Restores KoGaMaBuddy emojis. <br>
+  ```
+  Start typing : to view available emoji menu
+  ```
 
 - **Preview Marketplace Images:** View larger previews of items from the marketplace.
 
@@ -40,11 +43,22 @@
 
 - **Steal Description:** Easily copy descriptions for editing or inspiration.
 
-- **User Backgrounds:** Set KoGaMaBuddy user-profile backgrounds with custom filters.
+- **User Backgrounds:** Set KoGaMaBuddy user-profile backgrounds with custom filters that can be chained with each other.
+  ```
+   Background:GAMEID,filter:PROPERTY; 
+   Background:11019613,filter:meteorshower, rain; 
+  ```
 
 - **User Gradients:** Assign a global gradient to your profile using gradient data in your description.
+  ```
+  linear-gradient(114deg, #052b48, #14172e 79%) 
+  ```
 
-- **User Banner:** Compact banners for profiles; format: `banner: "BANNER_CONTENT", #HEX_COLOR;`.
+- **User Banner:** Compact banners for profiles <br>
+  ```
+  banner: "BANNER_CONTENT", #HEX_COLOR;
+  banner: "I am the happiest boyfriend ever", ##052b48;
+  ```
 
 - **View CommentDate:** See when a comment was posted.
 
