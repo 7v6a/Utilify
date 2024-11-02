@@ -32,14 +32,17 @@ On top of porting KoGaMaBuddy's features it also adds countless new and never-se
 
 <br><br>
 > [!CAUTION]
-> <h2>Read Before Using</h2>
+> <h2>Important Information</h2>
 > <p>
-> This script relies on javascript executor, which are often distrusted. <br>
-> My loader of choice is tampermonkey, visit their website to install it below: <br>
+> This script requires a userscript manager like Tampermonkey to function properly. <br>
+> Please note that scripts executed through userscript managers may not be trusted, and it's your responsibility to ensure the safety and legitimacy of the scripts you run. 
+> If you choose to proceed, make sure to review the code and understand what it does. 
+> You can install Tampermonkey from the link below:
+> </p>
+> 
+> [<img src="Modules/img/tmonk.png" width="260"/>](https://www.tampermonkey.net/) 
+> <br><br>
 >
-> [<img src="Modules/img/tmonk.png" width="260"/>](https://www.tampermonkey.net/) <br>
-
-<br><br>
 
 > [!IMPORTANT]  
 > <h2> Features & Installation</h2>
