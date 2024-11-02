@@ -79,5 +79,8 @@
 - **ExportImportConfig:** Easily export and import configuration settings (like fonts, gradients, and saved accounts).
 
 - **WhatActivity:** Displays what others are playing or building.
+  ```
+  Currently works only on the profile/me/ page due how it has been made.
+  ```
 
 - **ProjectManipulation:** Manage project invites and your projects quickly.
