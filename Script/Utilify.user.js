@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.1.8
+// @version      4.1.9
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -13,7 +13,6 @@
 // @connect      kogama.com.br
 // @connect      kogama.com
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
-// @icon         https://i.imgur.com/hG5QwIl.gif
 // ==/UserScript==
 
 // Stable release: more bug fixes ....
@@ -3239,53 +3238,6 @@ GM_addStyle(`
 
     waitForElements('input.MuiInputBase-input.MuiFilledInput-input', addPasswordGeneratorUI);
 })();
-// This part will get deleted soon, I was way too sassy over kogama, lmfao. -s
-// (function() {
-//     'use strict';
-//     const restrictedUrls = [
-//         "https://www.kogama.com/profile/668970496/*",
-//         "https://www.kogama.com/profile/22217990/*",
-//         "https://www.kogama.com/profile/670033029/*"
-//     ];
-//
-//     function isRestrictedUrl(url) {
-//         return restrictedUrls.some(restrictedUrl => {
-//             const regex = new RegExp(restrictedUrl.replace(/\*/g, '.*'));
-//             return regex.test(url);
-//         });
-//     }
-//     function restrictContent() {
-//         document.body.innerHTML = '';
-//         const style = document.createElement('style');
-//         style.textContent = `
-//             @font-face {
-//                 font-family: 'IBMPlexSerif';
-//                 src: url('https://cdn.jsdelivr.net/gh/IBM/plex@master/packages/plex-serif/fonts/complete/woff2/IBMPlexSerif-Medium.woff2') format('woff2');
-//                 font-weight: 500;
-//                 font-style: normal;
-//                 font-display: swap;
-//             }
-//             body {
-//                 background-color: black;
-//                 color: white;
-//                 font-family: 'IBMPlexSerif', serif;
-//                 font-size: 36px;
-//                 text-align: center;
-//                 margin-top: 20%;
-//             }
-//         `;
-//         document.head.appendChild(style);
-//         const message = document.createElement('div');
-//         message.textContent = 'CONTENT RESTRICTION';
-//         document.body.appendChild(message);
-//     }
-//
-//     if (isRestrictedUrl(window.location.href)) {
-//         restrictContent();
-//     }
-//
-// })()
-
 ;(async () => {
     "use strict";
 
@@ -5236,26 +5188,6 @@ GM_addStyle(`
     }
 
     InsertBeforeLoad();
-})();
-
-(function() {
-    'use strict';
-
-    function replaceImageAndTooltip() {
-        const targetElement = document.querySelector('div._2Jlgl a');
-
-        if (targetElement) {
-            const newImageUrl = 'https://i.imgur.com/hG5QwIl.gif';
-            const imgElement = targetElement.querySelector('img');
-            if (imgElement) {
-                imgElement.src = newImageUrl;
-                imgElement.srcset = newImageUrl + ' 2x';
-            }
-            const newTooltipText = 'Utilify Client';
-            targetElement.setAttribute('title', newTooltipText);
-        }
-    }
-    window.addEventListener('load', replaceImageAndTooltip);
 })()
 ;(function() {
     'use strict';
