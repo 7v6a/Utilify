@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.1.7
+// @version      4.1.8
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -16,7 +16,7 @@
 // @icon         https://i.imgur.com/hG5QwIl.gif
 // ==/UserScript==
 
-// Stable release: Shiggy + bug fixes
+// Stable release: more bug fixes ....
 // Reverted @require from github because it did not work as well for updates, I'm sorry about that.
 (function() {
     'use strict';
@@ -254,7 +254,7 @@
         updateDiv.appendChild(updateMessage);
 
         const versionLink = document.createElement('a');
-        versionLink.href = 'https://github.com/grimbbg/Utilify/raw/main/Script/Utilify.user.js';
+        versionLink.href = 'https://github.com/ctaah/Utilify/raw/main/Script/Utilify.user.js';
         versionLink.textContent = latestVersion;
         versionLink.style.color = '#1E90FF';
         versionLink.style.textDecoration = 'underline';
@@ -275,7 +275,7 @@
     }
 
     function checkForUpdate() {
-        const versiondesync = 'https://api.github.com/repos/grimbbg/Utilify/contents/Script/Utilify.user.js';
+        const versiondesync = 'https://api.github.com/repos/ctaah/Utilify/contents/Script/Utilify.user.js';
         fetch(versiondesync, {
             headers: {
                 'Accept': 'application/vnd.github.v3.raw'
@@ -4772,7 +4772,7 @@ GM_addStyle(`
         );
         console.log(
             "%c" +
-                "Want to help out? Check out -> github.com/grimbbg/Utilify",
+                "Want to help out? Check out -> github.com/ctaah/Utilify",
             ConsoleStyle.INVITE
         );
         console.log(
@@ -5368,11 +5368,14 @@ const injectCss = (id, css) => {
 			.replace(/&amp;amp;#39;/g, "'")
 			.replace(/&amp;gt;/g, ">")
 			.replace(/&amp;amp;gt;/g, ">")
+			.replace(/&amp;lt;/g, "<")
+			.replace(/&amp;amp;lt;/g, "<")
 	}
+
 	function fixInput(input) {
 		if (
 			input.value.match(
-				/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;/,
+				/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;|&amp;lt;|&amp;amp;lt;/,
 			)
 		) {
 			input.value = fixText(input.value)
@@ -5380,6 +5383,7 @@ const injectCss = (id, css) => {
 			input.dispatchEvent(new Event("change", { bubbles: true }))
 		}
 	}
+
 	function fixAllElements() {
 		const inputs = document.querySelectorAll(
 			'input[type="text"], input[type="search"], textarea',
@@ -5396,13 +5400,14 @@ const injectCss = (id, css) => {
 		while ((currentNode = textNodes.nextNode())) {
 			if (
 				currentNode.nodeValue.match(
-					/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;/,
+					/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;|&amp;lt;|&amp;amp;lt;/,
 				)
 			) {
 				currentNode.nodeValue = fixText(currentNode.nodeValue)
 			}
 		}
 	}
+
 	window.addEventListener("load", fixAllElements)
 	const observer = new MutationObserver(mutations => {
 		mutations.forEach(mutation => {
@@ -5424,7 +5429,7 @@ const injectCss = (id, css) => {
 						while ((currentNode = textNodes.nextNode())) {
 							if (
 								currentNode.nodeValue.match(
-									/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;/,
+									/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;|&amp;lt;|&amp;amp;lt;/,
 								)
 							) {
 								currentNode.nodeValue = fixText(currentNode.nodeValue)
@@ -5435,7 +5440,7 @@ const injectCss = (id, css) => {
 			} else if (
 				mutation.type === "characterData" &&
 				mutation.target.nodeValue.match(
-					/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;/,
+					/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;|&amp;lt;|&amp;amp;lt;/,
 				)
 			) {
 				mutation.target.nodeValue = fixText(mutation.target.nodeValue)
@@ -5443,7 +5448,7 @@ const injectCss = (id, css) => {
 				mutation.type === "attributes" &&
 				mutation.target.value &&
 				mutation.target.value.match(
-					/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;/,
+					/&amp;#34;|&amp;amp;#34;|&amp;#39;|&amp;amp;#39;|&amp;gt;|&amp;amp;gt;|&amp;lt;|&amp;amp;lt;/,
 				)
 			) {
 				fixInput(mutation.target)
