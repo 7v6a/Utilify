@@ -15,7 +15,7 @@ On top of porting KoGaMaBuddy's features it also adds countless new and never-se
 
 > [!TIP]
 > Looking for suppor regarding Utilify? Trying to suggest a new feature? <br>
-> Feel welcome to add me on discord @ [puvish](https://www.kogama.com/profile/17769289/)
+> Feel welcome to add me on discord @ [ctaah](https://www.kogama.com/profile/17769289/)
 
 
 > [!NOTE]
