@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.1.9
+// @version      4.2
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -15,7 +15,7 @@
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
-// Stable release: more bug fixes ....
+// Stable release: annoying classes change bug fixes
 // Reverted @require from github because it did not work as well for updates, I'm sorry about that.
 (function() {
     'use strict';
@@ -904,7 +904,7 @@
     }
 
     function addLoginButtonToNavbar() {
-        const loginButton = document.querySelector('#nav-bar .MuiButton-root.MuiButton-text');
+        const loginButton = document.querySelector("body#root-page-mobile > div#root:nth-of-type(1) > div > header.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation4.MuiAppBar-root.MuiAppBar-colorPrimary.MuiAppBar-positionStatic._1q4mD.css-x84yyj > div.MuiToolbar-root.MuiToolbar-gutters.MuiToolbar-dense._1sUGu.css-qizlhk > ol._3hI0M > li._3WhKY.fMxTS._2QuqZ:nth-of-type(1) > button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textDefault.MuiButton-sizeSmall.MuiButton-textSizeSmall.MuiButton-colorDefault.css-f3wymp");
 
         if (loginButton) {
             const loginPlusButton = document.createElement('div');
@@ -2380,6 +2380,9 @@ GM_addStyle(`
             font-family: monospace;
             display: inline;
         }
+        ._1q4mD ._1sUGu ._1u05O {
+        background-color: transparent !important;
+        }
     `);
 
     var menuLabel = document.createElement("div");
@@ -2387,7 +2390,9 @@ GM_addStyle(`
     menuLabel.textContent = "Utilify";
 
     setTimeout(function() {
-        var header = document.querySelector("#nav-bar > .MuiPaper-root.MuiAppBar-root.MuiAppBar-positionStatic.MuiAppBar-colorPrimary._1q4mD.MuiPaper-elevation0 > .MuiToolbar-root.MuiToolbar-dense._1sUGu.MuiToolbar-gutters > ._2mwlM > ._290sk");
+        var header = document.querySelector("body#root-page-mobile > div#root:nth-of-type(1) > div > header.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation4.MuiAppBar-root.MuiAppBar-colorPrimary.MuiAppBar-positionStatic._1q4mD.css-x84yyj > div.MuiToolbar-root.MuiToolbar-gutters.MuiToolbar-dense._1sUGu.css-qizlhk > div._2mwlM > div._290sk:nth-of-type(3)");
+
+
 
         if (header) {
             var marketplaceLink = header.querySelector('a[href="/marketplace/"]');
