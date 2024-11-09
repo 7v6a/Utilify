@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.2
+// @version      4.2.2
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
 // @grant        GM_setClipboard
 // @grant        GM.xmlHttpRequest
 // @grant        GM_addStyle
+// @grant        GM_xmlhttpRequest
 // @grant        GM_download
 // @connect      friends.kogama.com
 // @connect      kogama.com.br
@@ -15,8 +16,12 @@
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
-// Stable release: annoying classes change bug fixes
-// Reverted @require from github because it did not work as well for updates, I'm sorry about that.
+// Stable release: Fixed bug regarding not being able to load */games/play pages
+// For the time being Importing/Exporting Settings has been removed since it caused conflict.
+// I will try to get it working as soon as possible.
+
+
+
 (function() {
     'use strict';
     const regexPattern = /(https?:\/\/(?:www\.)?(?:kogama\.com\.br|friends\.kogama\.com|www\.kogama\.com)\/profile\/\d+\/|https?:\/\/(?:www\.)?(?:kogama\.com\.br|friends\.kogama\.com|www\.kogama\.com)\/profile\/[A-Z]+UID\/)/g;
@@ -113,114 +118,6 @@
         setInterval(replaceUrls, 5000);
     }
     startContinuousScan();
-})()
-; // importing and exporting config data (fonts; etc)
-(function () {
-    'use strict';
-    if (!window.location.pathname.endsWith('/config')) {
-        return;
-    }
-    function downloadJSON(data, filename) {
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-    function exportConfig() {
-        const keysToExport = [
-            "lastUpdateCheck",
-            "config",
-            "kogamaGradient",
-            "accounts"
-        ];
-        const exportData = keysToExport.reduce((data, key) => {
-            if (localStorage.getItem(key) !== null) {
-                data[key] = localStorage.getItem(key);
-            }
-            return data;
-        }, {});
-        downloadJSON(exportData, "kogama_config.json");
-    }
-    function importConfig() {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".json";
-        input.onchange = async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            const text = await file.text();
-            try {
-                const data = JSON.parse(text);
-                Object.keys(data).forEach(key => {
-                    if (data[key] != null) {
-                        localStorage.setItem(key, data[key]);
-                    }
-                });
-                alert("Configuration imported successfully!");
-            } catch (error) {
-                alert("Failed to import configuration: Invalid JSON format.");
-            }
-        };
-        input.click();
-    }
-    const menu = document.createElement("div");
-    menu.style.position = "fixed";
-    menu.style.bottom = "20px";
-    menu.style.left = "50%";
-    menu.style.transform = "translateX(-50%)";
-    menu.style.backgroundColor = "#1A1A1A";
-    menu.style.padding = "12px 24px";
-    menu.style.borderRadius = "10px";
-    menu.style.border = "2px solid #5A3C85";
-    menu.style.boxShadow = "0px 4px 12px rgba(0, 0, 0, 0.4)";
-    menu.style.display = "flex";
-    menu.style.gap = "15px";
-    menu.style.fontFamily = "Arial, sans-serif";
-    menu.style.color = "#FFFFFF";
-    menu.style.zIndex = "10000";
-    menu.style.transition = "background-color 0.4s ease, border-color 0.4s ease";
-    const buttonStyle = `
-        padding: 10px 16px;
-        background-color: #2B2B2B;
-        border: none;
-        border-radius: 6px;
-        color: #FFFFFF;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    `;
-    const exportButton = document.createElement("button");
-    exportButton.textContent = "Export";
-    exportButton.style = buttonStyle;
-    exportButton.style.border = "1px solid #5A3C85";
-    exportButton.onmouseover = () => {
-        exportButton.style.backgroundColor = "#5A3C85";
-        exportButton.style.color = "#E1D5F7";
-    };
-    exportButton.onmouseleave = () => {
-        exportButton.style.backgroundColor = "#2B2B2B";
-        exportButton.style.color = "#FFFFFF";
-    };
-    exportButton.onclick = exportConfig;
-    const importButton = document.createElement("button");
-    importButton.textContent = "Import";
-    importButton.style = buttonStyle;
-    importButton.style.border = "1px solid #5A3C85";
-    importButton.onmouseover = () => {
-        importButton.style.backgroundColor = "#5A3C85";
-        importButton.style.color = "#E1D5F7";
-    };
-    importButton.onmouseleave = () => {
-        importButton.style.backgroundColor = "#2B2B2B";
-        importButton.style.color = "#FFFFFF";
-    };
-    importButton.onclick = importConfig;
-    menu.appendChild(exportButton);
-    menu.appendChild(importButton);
-    document.body.appendChild(menu);
 })()
 ;(function() {
     'use strict';
@@ -2383,6 +2280,9 @@ GM_addStyle(`
         ._1q4mD ._1sUGu ._1u05O {
         background-color: transparent !important;
         }
+        body#root-page-mobile #nav-bar {
+        background-color: transparent !important;
+        box-shadow: none !important;
     `);
 
     var menuLabel = document.createElement("div");
@@ -2390,9 +2290,8 @@ GM_addStyle(`
     menuLabel.textContent = "Utilify";
 
     setTimeout(function() {
-        var header = document.querySelector("body#root-page-mobile > div#root:nth-of-type(1) > div > header.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation4.MuiAppBar-root.MuiAppBar-colorPrimary.MuiAppBar-positionStatic._1q4mD.css-x84yyj > div.MuiToolbar-root.MuiToolbar-gutters.MuiToolbar-dense._1sUGu.css-qizlhk > div._2mwlM > div._290sk:nth-of-type(3)");
-
-
+         var header = document.querySelector("body#root-page-mobile > div#root:nth-of-type(1) > div > header.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation4.MuiAppBar-root.MuiAppBar-colorPrimary.MuiAppBar-positionStatic._1q4mD.css-x84yyj > div.MuiToolbar-root.MuiToolbar-gutters.MuiToolbar-dense._1sUGu.css-qizlhk > div._2mwlM > div._290sk:nth-of-type(3)") ||
+                  document.querySelector("body#root-page-mobile > div#nav-bar > header.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation4.MuiAppBar-root.MuiAppBar-colorPrimary.MuiAppBar-positionStatic._1q4mD.css-x84yyj > div.MuiToolbar-root.MuiToolbar-gutters.MuiToolbar-dense._1sUGu.css-qizlhk > div._2mwlM > div._290sk");
 
         if (header) {
             var marketplaceLink = header.querySelector('a[href="/marketplace/"]');
@@ -3431,7 +3330,7 @@ GM_addStyle(`
         const paginator = await checkUrlAndFetchPaginator();
 
         if (!paginator) {
-            console.error("Paginator not found.");
+ //           console.error("Paginator not found.");
             return;
         }
 
@@ -3991,8 +3890,13 @@ GM_addStyle(`
 })()
 ;(function () {
 	"use strict"
+	const pathname = window.location.pathname
+	const regex = /^\/profile\/\d+\/$/;
 
-	const profileId = window.location.pathname.split("/")[2]
+	if (!regex.test(pathname)) {
+		return;
+	}
+	const profileId = pathname.split("/")[2]
 	const requestUrl = `https://www.kogama.com/profile/${profileId}/`
 
 	fetch(requestUrl)
@@ -4017,22 +3921,13 @@ GM_addStyle(`
 			}
 		})
 		.catch(error => {
+			console.error("Error fetching profile data:", error);
 		})
 
 	function getMonthName(monthIndex) {
 		const months = [
-			"January",
-			"February",
-			"March",
-			"April",
-			"May",
-			"June",
-			"July",
-			"August",
-			"September",
-			"October",
-			"November",
-			"December",
+			"January", "February", "March", "April", "May", "June",
+			"July", "August", "September", "October", "November", "December"
 		]
 		return months[monthIndex]
 	}
@@ -4041,7 +3936,6 @@ GM_addStyle(`
 		return num < 10 ? "0" + num : num
 	}
 })()
-
 ;(function () {
     "use strict";
 
@@ -6937,3 +6831,25 @@ const injectCss = (id, css) => {
     monitorRequests();
 
 })();
+(function() {
+    'use strict';
+
+    function replaceImageAndTooltip() {
+        const targetElement = document.querySelector('div._2Jlgl a');
+
+        if (targetElement) {
+            const newImageUrl = 'https://i.imgur.com/Shs82X2.jpeg';
+            const imgElement = targetElement.querySelector('img');
+            if (imgElement) {
+                imgElement.src = newImageUrl;
+                imgElement.srcset = newImageUrl + ' 2x';
+            }
+            const newTooltipText = 'Utilify';
+            targetElement.setAttribute('title', newTooltipText);
+            targetElement.setAttribute('href', 'https://www.github.com/ctaah/utilify');
+        }
+    }
+    window.addEventListener('load', replaceImageAndTooltip);
+})();
+
+
