@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.2.4
+// @version      4.2.5
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -1735,7 +1735,10 @@ fetch(url)
 	})
 })()
 GM_addStyle(`
-
+        .UA3TP ._3tYRU, .UA3TP rect {
+        clip-path: circle(50%) !important;
+}
+        }
     ._13UrL .kR267 ._9smi2 ._1rJI8:not(::before):not(::after) {
         filter: none; /* Resetting filter for pseudo-elements */
     }
