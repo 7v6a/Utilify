@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.2.2
+// @version      4.2.4
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -16,7 +16,8 @@
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
-// Stable release: Fixed bug regarding not being able to load */games/play pages
+// Stable release: Fixed profile effects*
+
 // For the time being Importing/Exporting Settings has been removed since it caused conflict.
 // I will try to get it working as soon as possible.
 
@@ -240,40 +241,38 @@
     function fetchFriendChat(userId) {
         const url = `https://www.kogama.com/user/${userId}/friend/chat/`;
 
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.data && Array.isArray(data.data)) {
-                    data.data.forEach(friend => {
-                        const username = friend.username;
-                        const location = friend.location || 'N/A';
+fetch(url)
+    .then(response => response.text()) // Get the response as text
+    .then(text => {
+        let data;
+        try {
+            data = JSON.parse(text); // Try parsing the text as JSON
+        } catch (e) {
+            data = {}; // If it fails, set data to an empty object (or handle it however you like)
+        }
 
-                        if (location !== 'N/A') {
-                            const gameMatch = location.match(/\/games\/play\/(\d+)\//);
-                            if (gameMatch) {
-                                const GID = gameMatch[1];
-                                fetchGameTitle(GID, username);
-                            }
+        if (data.data && Array.isArray(data.data)) {
+            data.data.forEach(friend => {
+                const username = friend.username;
+                const location = friend.location || 'N/A';
 
-                            const projectMatch = location.match(/\/build\/\d+\/project\/(\d+)\//);
-                            if (projectMatch) {
-                                const POID = projectMatch[1];
-                                fetchProjectName(POID, username);
-                            }
-                        }
-                    });
+                if (location !== 'N/A') {
+                    const gameMatch = location.match(/\/games\/play\/(\d+)\//);
+                    if (gameMatch) {
+                        const GID = gameMatch[1];
+                        fetchGameTitle(GID, username);
+                    }
+
+                    const projectMatch = location.match(/\/build\/\d+\/project\/(\d+)\//);
+                    if (projectMatch) {
+                        const POID = projectMatch[1];
+                        fetchProjectName(POID, username);
+                    }
                 }
-            })
-            .catch(error => {
-                console.error('Error fetching friend chat data:', error);
             });
+        }
+    });
     }
-
     const gameTitles = {};
     function fetchGameTitle(GID, username) {
         const url = `https://www.kogama.com/games/play/${GID}/`;
@@ -330,7 +329,7 @@
 
     function startRescanning() {
         logUserId();
-        setInterval(logUserId, 7000);
+//        setInterval(logUserId, 7000);
     }
 
     DOMReady(() => {
@@ -4634,7 +4633,8 @@ GM_addStyle(`
     }, 2400);
 }
 
-;(async function () {
+
+(async function () {
     "use strict";
 
     const waitForElement = async selector => {
@@ -4652,7 +4652,7 @@ GM_addStyle(`
             const DESCRIPTION_TEXT = DESCRIPTION_ELEMENT.textContent;
             const BACKGROUND_AVATAR = document.querySelector("._33DXe");
             const BACKGROUND_SECTION = document.querySelector("._33DXe");
-            const BODY_ELEMENT = document.querySelector("body#root-page-mobile");
+            const BODY_ELEMENT = document.querySelector("#root-page-mobile");
             const BACKGROUND_REGEXP =
                 /(?:\|\|)?Background:\s*(\d+)(?:,\s*filter:\s*([a-z, ]+))?;?(?:\|\|)?/i;
             const GRADIENT_REGEXP =
@@ -4677,7 +4677,6 @@ GM_addStyle(`
 
                 BACKGROUND_SECTION.style.backgroundImage = `url("${imageSrc}")`;
 
-                // Apply filters
                 const filterFunctions = {
                     blur: () => BACKGROUND_SECTION.style.filter = "blur(5px)",
                     none: () => {
@@ -4704,10 +4703,13 @@ GM_addStyle(`
 
             if (gradientMatch && typeof gradientMatch == "object") {
                 const gradient = gradientMatch[0];
-                BODY_ELEMENT.setAttribute(
-                    "style",
-                    `background-image: ${gradient} !important; transition: background-image 0.721s ease-in;`
-                );
+                console.log("Extracted Gradient:", gradient);
+                GM_addStyle(`
+                    #root-page-mobile {
+                        background-image: ${gradient} !important;
+                        transition: background-image 0.721s ease-in !important;
+                    }
+                `);
             }
         } catch (error) {
             console.error("Error:", error.message);
@@ -4716,18 +4718,32 @@ GM_addStyle(`
 
     async function fetchImageSource(gameId) {
         try {
-            const url = `https://www.kogama.com/games/play/${gameId}/embed`;
+            const url = `https://www.kogama.com/games/play/${gameId}/`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`Failed to fetch. Status: ${response.status}`);
             }
             const htmlText = await response.text();
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = htmlText;
-            const inputElement = tempDiv.querySelector("li.large input.pure-input");
-            const kogstaticUrl = inputElement.value;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            const script = Array.from(doc.querySelectorAll('script')).find(s => s.textContent.includes('options.bootstrap'));
 
-            return kogstaticUrl;
+            if (script) {
+                const match = script.textContent.match(/options\.bootstrap = ({.*?});/);
+                if (match && match[1]) {
+                    const bootstrapData = JSON.parse(match[1]);
+                    const imageUrls = bootstrapData.object?.images;
+
+                    if (imageUrls) {
+                        const filteredImageUrl = imageUrls.large || Object.values(imageUrls).find(url => url.endsWith('600x240.jpg'));
+                        if (filteredImageUrl) {
+                            return filteredImageUrl;
+                        }
+                    }
+                }
+            }
+
+            throw new Error('No image found in bootstrap data.');
         } catch (error) {
             throw new Error(`Error fetching image source: ${error.message}`);
         }
@@ -4760,7 +4776,7 @@ GM_addStyle(`
                     drop.style.height = "15px";
                     drop.style.bottom = `${Math.random() * 100}%`;
                     drop.style.left = `${Math.random() * 100}%`;
-                    drop.style.animation = `fall ${Math.random() * 1 + 1}s linear infinite`;
+                    drop.style.animation = `fall ${Math.random() * 6 + 6}s linear infinite`;
                     rainOverlay.appendChild(drop);
                 }
                 const styleSheet = document.createElement("style");
@@ -4781,310 +4797,282 @@ GM_addStyle(`
         });
     }
 
-    function applyMeteorShowerEffect() {
-        const targetElements = [
-            document.querySelector("._13UrL ._23KvS"),
-            document.querySelector("._13UrL ._23KvS ._33DXe"),
-        ];
-        targetElements.forEach(element => {
-            if (element) {
-                const meteorOverlay = document.createElement("div");
-                meteorOverlay.style.position = "absolute";
-                meteorOverlay.style.top = "0";
-                meteorOverlay.style.left = "0";
-                meteorOverlay.style.width = "100%";
-                meteorOverlay.style.height = "100%";
-                meteorOverlay.style.pointerEvents = "none";
-                meteorOverlay.style.zIndex = "10";
-                meteorOverlay.style.overflow = "hidden";
-                element.appendChild(meteorOverlay);
+function applyMeteorShowerEffect() {
+    const targetElements = [
+        document.querySelector("._13UrL ._23KvS"),
+        document.querySelector("._13UrL ._23KvS ._33DXe"),
+    ];
 
-                const numMeteors = 80;
-                for (let i = 0; i < numMeteors; i++) {
-                    const meteor = document.createElement("div");
-                    meteor.className = "meteor";
-                    meteor.style.position = "absolute";
-                    meteor.style.width = "0";
-                    meteor.style.height = "0";
-                    meteor.style.transformOrigin = "left bottom";
-                    meteor.style.animation = `fall ${Math.random() * 4 + 5}s linear infinite`;
-                    meteor.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="10" height="10">
-                            <circle cx="5" cy="5" r="2" fill="${getRandomColor()}"/>
-                            <line x1="5" y1="5" x2="5" y2="10" stroke="${getRandomColor()}" stroke-width="1" stroke-opacity="0.6"/>
-                        </svg>
-                    `;
+    targetElements.forEach(element => {
+        if (element) {
+            const meteorOverlay = document.createElement("div");
+            meteorOverlay.style.position = "absolute";
+            meteorOverlay.style.top = "0";
+            meteorOverlay.style.left = "0";
+            meteorOverlay.style.width = "100%";
+            meteorOverlay.style.height = "100%";
+            meteorOverlay.style.pointerEvents = "none";
+            meteorOverlay.style.zIndex = "10";
+            element.appendChild(meteorOverlay);
 
-                    meteor.style.top = `${Math.random() * 100}%`;
-                    meteor.style.left = `${Math.random() * 100}%`;
-                    meteor.style.opacity = "0.9";
-                    meteorOverlay.appendChild(meteor);
-                }
+            const numMeteors = 80;
+            for (let i = 0; i < numMeteors; i++) {
+                const meteor = document.createElement("div");
+                meteor.className = "meteor";
+                meteor.style.position = "absolute";
+                meteor.style.width = `${Math.random() * 3 + 2}px`;
+                meteor.style.height = `${Math.random() * 5 + 5}px`;
+                meteor.style.top = `-${Math.random() * 50}%`;
+                meteor.style.left = `${Math.random() * 100}%`;
+                meteor.style.animation = `fall ${Math.random() * 6 + 4}s linear infinite`;
+                meteor.style.background = `radial-gradient(circle, ${getRandomColor()} 0%, ${getRandomColor()} 100%)`;
+                meteor.style.borderRadius = "50%";
 
-                const styleSheet = document.createElement("style");
-                styleSheet.type = "text/css";
-                styleSheet.innerText = `
-                    @keyframes fall {
-                        from {
-                            transform: translate(0, 0) rotate(${Math.random() * 360}deg);
-                        }
-                        to {
-                            transform: translateY(100vh);
-                        }
-                    }
-                    .meteor {
-                        z-index: 10;
-                        animation: fall linear infinite;
-                    }
-                `;
-                document.head.appendChild(styleSheet);
+                meteorOverlay.appendChild(meteor);
             }
-        });
+        }
+    });
+}
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
     }
+    return color;
+}
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes fall {
+        0% {
+            transform: translateY(0) rotate(0deg);
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+        }
+    }
+`;
+document.head.appendChild(style);
+
 
     function applyStarlightEffect() {
         const targetElements = [
             document.querySelector("._13UrL ._23KvS"),
             document.querySelector("._13UrL ._23KvS ._33DXe"),
         ];
-
         targetElements.forEach(element => {
             if (element) {
-                const starlightOverlay = document.createElement("div");
-                starlightOverlay.style.position = "absolute";
-                starlightOverlay.style.top = "0";
-                starlightOverlay.style.left = "0";
-                starlightOverlay.style.width = "100%";
-                starlightOverlay.style.height = "100%";
-                starlightOverlay.style.pointerEvents = "none";
-                starlightOverlay.style.zIndex = "2";
-                starlightOverlay.style.overflow = "hidden";
-                element.appendChild(starlightOverlay);
+                const starOverlay = document.createElement("div");
+                starOverlay.style.position = "absolute";
+                starOverlay.style.top = "0";
+                starOverlay.style.left = "0";
+                starOverlay.style.width = "100%";
+                starOverlay.style.height = "100%";
+                starOverlay.style.pointerEvents = "none";
+                starOverlay.style.zIndex = "10";
+                starOverlay.style.overflow = "hidden";
+                element.appendChild(starOverlay);
 
-                const numStars = 200; // Adjust number of stars as needed
+                const numStars = 150;
                 for (let i = 0; i < numStars; i++) {
                     const star = document.createElement("div");
                     star.className = "star";
                     star.style.position = "absolute";
-                    star.style.width = "2px";
-                    star.style.height = "2px";
-                    star.style.backgroundColor = "#fff";
+                    star.style.background = "rgba(255, 255, 255, 0.8)";
                     star.style.borderRadius = "50%";
+                    star.style.width = `${Math.random() * 3 + 1}px`;
+                    star.style.height = `${Math.random() * 3 + 1}px`;
                     star.style.top = `${Math.random() * 100}%`;
                     star.style.left = `${Math.random() * 100}%`;
-                    star.style.opacity = Math.random() * 0.5 + 0.5; // Random opacity
-                    starlightOverlay.appendChild(star);
+                    starOverlay.appendChild(star);
                 }
-
-                const styleSheet = document.createElement("style");
-                styleSheet.type = "text/css";
-                styleSheet.innerText = `
-                    @keyframes twinkle {
-                        0% { opacity: 0.5; }
-                        50% { opacity: 1; }
-                        100% { opacity: 0.5; }
-                    }
-                    .star {
-                        animation: twinkle ${Math.random() * 3 + 2}s infinite ease-in-out;
-                    }
-                `;
-                document.head.appendChild(styleSheet);
             }
         });
     }
 
 
+function applyAuroraEffect() {
+    const targetElements = [
+        document.querySelector("._13UrL ._23KvS"),
+        document.querySelector("._13UrL ._23KvS ._33DXe"),
+    ];
+    targetElements.forEach(element => {
+        if (element) {
+            const auroraOverlay = document.createElement("div");
+            auroraOverlay.style.position = "absolute";
+            auroraOverlay.style.top = "0";
+            auroraOverlay.style.left = "0";
+            auroraOverlay.style.width = "100%";
+            auroraOverlay.style.height = "100%";
+            auroraOverlay.style.pointerEvents = "none";
+            auroraOverlay.style.zIndex = "10";
+            auroraOverlay.style.overflow = "hidden";
+            element.appendChild(auroraOverlay);
 
-    function applyAuroraEffect() {
-        const targetElements = [
-            document.querySelector("._13UrL ._23KvS"),
-            document.querySelector("._13UrL ._23KvS ._33DXe"),
-        ];
-        targetElements.forEach(element => {
-            if (element) {
-                const auroraOverlay = document.createElement("div");
-                auroraOverlay.style.position = "absolute";
-                auroraOverlay.style.top = "0";
-                auroraOverlay.style.left = "0";
-                auroraOverlay.style.width = "100%";
-                auroraOverlay.style.height = "100%";
-                auroraOverlay.style.pointerEvents = "none";
-                auroraOverlay.style.zIndex = "10";
-                auroraOverlay.style.overflow = "hidden";
-                element.appendChild(auroraOverlay);
+            const numAuroras = 10;
+            for (let i = 0; i < numAuroras; i++) {
+                const aurora = document.createElement("div");
+                aurora.className = "aurora";
+                aurora.style.position = "absolute";
+                aurora.style.width = "200px";
+                aurora.style.height = "200px";
+                aurora.style.background = `radial-gradient(circle at 50%, ${getRandomColor()}, transparent)`;
+                aurora.style.borderRadius = "50%";
+                aurora.style.top = `${Math.random() * 100}%`;
+                aurora.style.left = `${Math.random() * 100}%`;
+                aurora.style.opacity = Math.random();
+                aurora.style.animation = `move ${Math.random() * 5 + 5}s ease-in-out infinite`;
+                auroraOverlay.appendChild(aurora);
+            }
 
-                const numAuroras = 10;
-                for (let i = 0; i < numAuroras; i++) {
-                    const aurora = document.createElement("div");
-                    aurora.className = "aurora";
-                    aurora.style.position = "absolute";
-                    aurora.style.width = "200px";
-                    aurora.style.height = "200px";
-                    aurora.style.background = `radial-gradient(circle at 50%, ${getRandomColor()}, transparent)`;
-                    aurora.style.borderRadius = "50%";
-                    aurora.style.top = `${Math.random() * 100}%`;
-                    aurora.style.left = `${Math.random() * 100}%`;
-                    aurora.style.opacity = Math.random();
-                    aurora.style.animation = `move ${Math.random() * 5 + 5}s ease-in-out infinite`;
-                    auroraOverlay.appendChild(aurora);
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes move {
+                    from {
+                        transform: translateY(0);
+                    }
+                    to {
+                        transform: translateY(100px);
+                    }
                 }
-
-                const styleSheet = document.createElement("style");
-                styleSheet.type = "text/css";
-                styleSheet.innerText = `
-                    @keyframes move {
-                        from {
-                            transform: translateY(0);
-                        }
-                        to {
-                            transform: translateY(100px);
-                        }
-                    }
-                    .aurora {
-                        z-index: 10;
-                        animation: move ease-in-out infinite;
-                    }
-                `;
-                document.head.appendChild(styleSheet);
-            }
-        });
-    }
-    function applyFireflyEffect() {
-        const targetElements = [
-            document.querySelector("._13UrL ._23KvS"),
-            document.querySelector("._13UrL ._23KvS ._33DXe"),
-        ];
-        targetElements.forEach(element => {
-            if (element) {
-                const fireflyOverlay = document.createElement("div");
-                fireflyOverlay.style.position = "absolute";
-                fireflyOverlay.style.top = "0";
-                fireflyOverlay.style.left = "0";
-                fireflyOverlay.style.width = "100%";
-                fireflyOverlay.style.height = "100%";
-                fireflyOverlay.style.pointerEvents = "none";
-                fireflyOverlay.style.zIndex = "10";
-                fireflyOverlay.style.overflow = "hidden";
-                element.appendChild(fireflyOverlay);
-
-                const numFireflies = 50;
-                for (let i = 0; i < numFireflies; i++) {
-                    const firefly = document.createElement("div");
-                    firefly.className = "firefly";
-                    firefly.style.position = "absolute";
-                    firefly.style.width = "5px";
-                    firefly.style.height = "5px";
-                    firefly.style.background = "rgba(255, 255, 0, 0.8)";
-                    firefly.style.borderRadius = "50%";
-                    firefly.style.top = `${Math.random() * 100}%`;
-                    firefly.style.left = `${Math.random() * 100}%`;
-                    firefly.style.opacity = Math.random();
-                    firefly.style.animation = `blink ${Math.random() * 2 + 1}s ease-in-out infinite`;
-                    fireflyOverlay.appendChild(firefly);
+                .aurora {
+                    z-index: 10;
+                    animation: move ease-in-out infinite;
                 }
-
-                const styleSheet = document.createElement("style");
-                styleSheet.type = "text/css";
-                styleSheet.innerText = `
-                    @keyframes blink {
-                        0%, 100% {
-                            opacity: 1;
-                        }
-                        50% {
-                            opacity: 0.3;
-                        }
-                    }
-                    .firefly {
-                        z-index: 10;
-                        animation: blink ease-in-out infinite;
-                    }
-                `;
-                document.head.appendChild(styleSheet);
-            }
-        });
-    }
-
-    function applySnowEffect() {
-        const targetElements = [
-            document.querySelector("._13UrL ._23KvS"),
-            document.querySelector("._13UrL ._23KvS ._33DXe"),
-        ];
-        targetElements.forEach(element => {
-            if (element) {
-                const snowOverlay = document.createElement("div");
-                snowOverlay.style.position = "absolute";
-                snowOverlay.style.top = "0";
-                snowOverlay.style.left = "0";
-                snowOverlay.style.width = "100%";
-                snowOverlay.style.height = "100%";
-                snowOverlay.style.pointerEvents = "none";
-                snowOverlay.style.zIndex = "10";
-                snowOverlay.style.overflow = "hidden";
-                element.appendChild(snowOverlay);
-
-                const numSnowflakes = 100;
-                for (let i = 0; i < numSnowflakes; i++) {
-                    const snowflake = document.createElement("div");
-                    snowflake.className = "snowflake";
-                    snowflake.style.position = "absolute";
-                    snowflake.style.background = "rgba(255, 255, 255, 0.8)";
-                    snowflake.style.width = `${Math.random() * 3 + 5}px`;
-                    snowflake.style.height = snowflake.style.width;
-                    snowflake.style.borderRadius = "50%";
-                    snowflake.style.top = `${Math.random() * 100}%`;
-                    snowflake.style.left = `${Math.random() * 100}%`;
-                    snowflake.style.animation = `fall ${Math.random() * 5 + 5}s linear infinite`;
-                    snowOverlay.appendChild(snowflake);
-                }
-
-                const styleSheet = document.createElement("style");
-                styleSheet.type = "text/css";
-                styleSheet.innerText = `
-                    @keyframes fall {
-                        to {
-                            transform: translateY(100vh);
-                        }
-                    }
-                    .snowflake {
-                        z-index: 10;
-                        animation: fall linear infinite;
-                    }
-                `;
-                document.head.appendChild(styleSheet);
-            }
-        });
-    }
-    function applyHazeEffect() {
-        const targetElements = [
-            document.querySelector("._13UrL ._23KvS"),
-            document.querySelector("._13UrL ._23KvS ._33DXe"),
-        ];
-        targetElements.forEach(element => {
-            if (element) {
-                const hazeOverlay = document.createElement("div");
-                hazeOverlay.style.position = "absolute";
-                hazeOverlay.style.top = "0";
-                hazeOverlay.style.left = "0";
-                hazeOverlay.style.width = "100%";
-                hazeOverlay.style.height = "100%";
-                hazeOverlay.style.pointerEvents = "none";
-                hazeOverlay.style.zIndex = "-1";
-                hazeOverlay.style.overflow = "hidden";
-                hazeOverlay.style.background = "rgba(33, 33, 33, 0.3)";
-                hazeOverlay.style.backdropFilter = "blur(10px)";
-                element.appendChild(hazeOverlay);
-            }
-        });
-    }
-
-    function getRandomColor() {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
+            `;
+            document.head.appendChild(styleSheet);
         }
-        return color;
-    }
+    });
+}
+function applyFireflyEffect() {
+    const targetElements = [
+        document.querySelector("._13UrL ._23KvS"),
+        document.querySelector("._13UrL ._23KvS ._33DXe"),
+    ];
+    targetElements.forEach(element => {
+        if (element) {
+            const fireflyOverlay = document.createElement("div");
+            fireflyOverlay.style.position = "absolute";
+            fireflyOverlay.style.top = "0";
+            fireflyOverlay.style.left = "0";
+            fireflyOverlay.style.width = "100%";
+            fireflyOverlay.style.height = "100%";
+            fireflyOverlay.style.pointerEvents = "none";
+            fireflyOverlay.style.zIndex = "10";
+            fireflyOverlay.style.overflow = "hidden";
+            element.appendChild(fireflyOverlay);
+
+            const numFireflies = 50;
+            for (let i = 0; i < numFireflies; i++) {
+                const firefly = document.createElement("div");
+                firefly.className = "firefly";
+                firefly.style.position = "absolute";
+                firefly.style.width = "5px";
+                firefly.style.height = "5px";
+                firefly.style.background = "rgba(255, 255, 0, 0.8)";
+                firefly.style.borderRadius = "50%";
+                firefly.style.top = `${Math.random() * 100}%`;
+                firefly.style.left = `${Math.random() * 100}%`;
+                firefly.style.opacity = Math.random();
+                firefly.style.animation = `blink ${Math.random() * 2 + 1}s ease-in-out infinite`;
+                fireflyOverlay.appendChild(firefly);
+            }
+
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes blink {
+                    0%, 100% {
+                        opacity: 1;
+                    }
+                    50% {
+                        opacity: 0.3;
+                    }
+                }
+                .firefly {
+                    z-index: 10;
+                    animation: blink ease-in-out infinite;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+    });
+}
+
+function applySnowEffect() {
+    const targetElements = [
+        document.querySelector("._13UrL ._23KvS"),
+        document.querySelector("._13UrL ._23KvS ._33DXe"),
+    ];
+    targetElements.forEach(element => {
+        if (element) {
+            const snowOverlay = document.createElement("div");
+            snowOverlay.style.position = "absolute";
+            snowOverlay.style.top = "0";
+            snowOverlay.style.left = "0";
+            snowOverlay.style.width = "100%";
+            snowOverlay.style.height = "100%";
+            snowOverlay.style.pointerEvents = "none";
+            snowOverlay.style.zIndex = "10";
+            snowOverlay.style.overflow = "hidden";
+            element.appendChild(snowOverlay);
+
+            const numSnowflakes = 100;
+            for (let i = 0; i < numSnowflakes; i++) {
+                const snowflake = document.createElement("div");
+                snowflake.className = "snowflake";
+                snowflake.style.position = "absolute";
+                snowflake.style.background = "rgba(255, 255, 255, 0.8)";
+                snowflake.style.width = `${Math.random() * 3 + 5}px`;
+                snowflake.style.height = snowflake.style.width;
+                snowflake.style.borderRadius = "50%";
+                snowflake.style.top = `${Math.random() * 100}%`;
+                snowflake.style.left = `${Math.random() * 100}%`;
+                snowflake.style.animation = `fall ${Math.random() * 5 + 5}s linear infinite`;
+                snowOverlay.appendChild(snowflake);
+            }
+
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
+                @keyframes fall {
+                    to {
+                        transform: translateY(100vh);
+                    }
+                }
+                .snowflake {
+                    z-index: 10;
+                    animation: fall linear infinite;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+    });
+}
+function applyHazeEffect() {
+    const targetElements = [
+        document.querySelector("._13UrL ._23KvS"),
+        document.querySelector("._13UrL ._23KvS ._33DXe"),
+    ];
+    targetElements.forEach(element => {
+        if (element) {
+            const hazeOverlay = document.createElement("div");
+            hazeOverlay.style.position = "absolute";
+            hazeOverlay.style.top = "0";
+            hazeOverlay.style.left = "0";
+            hazeOverlay.style.width = "100%";
+            hazeOverlay.style.height = "100%";
+            hazeOverlay.style.pointerEvents = "none";
+            hazeOverlay.style.zIndex = "-1";
+            hazeOverlay.style.overflow = "hidden";
+            hazeOverlay.style.background = "rgba(33, 33, 33, 0.3)";
+            hazeOverlay.style.backdropFilter = "blur(10px)";
+            element.appendChild(hazeOverlay);
+        }
+    });
+}
 
     InsertBeforeLoad();
 })()
