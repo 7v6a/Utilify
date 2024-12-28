@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Utilify: KoGaMa
+// @name         [ DISCONTINUED ] Utilify: KoGaMa
 // @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.2.5
+// @version      4.3
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       ⛧ Simon
 // @match        *://www.kogama.com/*
@@ -16,11 +16,15 @@
 // @require      https://code.jquery.com/jquery-3.6.0.min.js
 // ==/UserScript==
 
-// Stable release: Fixed profile effects*
 
-// For the time being Importing/Exporting Settings has been removed since it caused conflict.
-// I will try to get it working as soon as possible.
 
+// Due to a huge inactivity of KoGaMa's Community I no longer see it worth to work on this extension.
+// I also know of no active users of my extension, meaning I get no additionl requests nor bug reports.
+// Thank you for everybody who supported and used it, I will move on to bigger and more advanced projects from now on. :)
+// Function to check for updates will be deleted in that final version to prevent overloading any sort of ToS.
+// I love you! - Simon.
+// In case you want to contact me, my discord ID is: 970332627221504081
+// You can also find me on github @ github.com/adouco
 
 
 (function() {
@@ -119,88 +123,6 @@
         setInterval(replaceUrls, 5000);
     }
     startContinuousScan();
-})()
-;(function() {
-    'use strict';
-    const CHECK_INTERVAL = 2 * 60 * 60 * 1000;
-
-    function getCurrentVersion() {
-        return GM_info.script.version;
-    }
-
-    function showUpdateNotification(latestVersion) {
-        const updateDiv = document.createElement('div');
-        updateDiv.id = 'update-notification';
-        updateDiv.style.position = 'fixed';
-        updateDiv.style.top = '-100px';
-        updateDiv.style.left = '50%';
-        updateDiv.style.transform = 'translateX(-50%)';
-        updateDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        updateDiv.style.color = 'white';
-        updateDiv.style.borderRadius = '8px';
-        updateDiv.style.padding = '15px';
-        updateDiv.style.boxShadow = '0px 4px 8px rgba(0,0,0,0.5)';
-        updateDiv.style.zIndex = '9999';
-        updateDiv.style.textAlign = 'center';
-        updateDiv.style.transition = 'top 0.5s ease-in-out';
-        updateDiv.style.fontFamily = 'Arial, sans-serif';
-        updateDiv.style.fontSize = '16px';
-
-        const updateMessage = document.createElement('p');
-        updateMessage.textContent = `Update available! Newest version is `;
-        updateDiv.appendChild(updateMessage);
-
-        const versionLink = document.createElement('a');
-        versionLink.href = 'https://github.com/ctaah/Utilify/raw/main/Script/Utilify.user.js';
-        versionLink.textContent = latestVersion;
-        versionLink.style.color = '#1E90FF';
-        versionLink.style.textDecoration = 'underline';
-        updateMessage.appendChild(versionLink);
-
-        document.body.appendChild(updateDiv);
-
-        setTimeout(() => {
-            updateDiv.style.top = '0';
-        }, 100);
-
-        setTimeout(() => {
-            updateDiv.style.top = '-100px';
-            setTimeout(() => {
-                document.body.removeChild(updateDiv);
-            }, 500);
-        }, 7000);
-    }
-
-    function checkForUpdate() {
-        const versiondesync = 'https://api.github.com/repos/ctaah/Utilify/contents/Script/Utilify.user.js';
-        fetch(versiondesync, {
-            headers: {
-                'Accept': 'application/vnd.github.v3.raw'
-            }
-        })
-        .then(response => response.text())
-        .then(data => {
-            const latestVersionMatch = data.match(/\/\/\s*@version\s+([0-9.]+)/);
-            if (latestVersionMatch) {
-                const latestVersion = latestVersionMatch[1];
-                const currentVersion = getCurrentVersion();
-
-                console.log(`Local Version: ${currentVersion}`);
-                console.log(`Repository Version: ${latestVersion}`);
-
-                if (latestVersion !== currentVersion) {
-                    showUpdateNotification(latestVersion);
-                } else {
-                    console.log(`No update needed: Both versions are ${currentVersion}`);
-                }
-            } else {
-                console.error("Unable to find the version in the fetched script.");
-            }
-        })
-        .catch(err => console.error("Error fetching the script:", err));
-    }
-    checkForUpdate();
-    setInterval(checkForUpdate, CHECK_INTERVAL);
 })()
 ; // this snippet is responsible for viewing the title of games that are being built / played by people on your friendslist.
 (function() {
@@ -4494,93 +4416,57 @@ GM_addStyle(`
 ;(function () {
 	"use strict"
 
-	function getUsernameFromTitle() {
-		const title = document.title
-		const username = title.split(" - ")[0]
-		return username
+function extractFromProfilePage() {
+    const usernameElement = document.querySelector("._2IqY6 h1 a"); // Selects the <a> inside <h1>
+    const userIDMatch = window.location.pathname.match(/\/profile\/([^/]+)\//);
+    const username = usernameElement ? usernameElement.textContent.trim() : "Unknown";
+    const userID = userIDMatch ? userIDMatch[1] : "N/A";
+    if (username && userID) {
+        document.title = `Discontinued Utilify - ${username} (${userID})`;
+    }
+}
+
+
+	function extractFromGamesPage() {
+		const gameTitleElement = document.querySelector(".game-title") // Update selector
+		const gameIDMatch = window.location.pathname.match(/\/games\/play\/([^/]+)\//)
+		const gameTitle = gameTitleElement ? gameTitleElement.innerText : "Game"
+		const gameID = gameIDMatch ? gameIDMatch[1] : "Unknown"
+		document.title = `Discontinued Utilify - ${gameTitle} (${gameID})`
 	}
 
-	function getUserIDFromURL() {
-		const userIDMatch = window.location.pathname.match(/\/profile\/([^/]+)\//)
-		return userIDMatch ? userIDMatch[1] : null
+	function extractFromMarketplacePage(type) {
+		const titleElement = document.querySelector(".marketplace-title") // Update selector
+		const title = titleElement ? titleElement.innerText.trim() : "Marketplace"
+		document.title = `Discontinued Utilify - ${title} (${type})`
 	}
 
-	function getGameInfoFromURL() {
-		const gameIDMatch = window.location.pathname.match(
-			/\/games\/play\/([^/]+)\//,
-		)
-		return gameIDMatch ? gameIDMatch[1] : null
-	}
-
-	function setDocumentTitle() {
+	function setDynamicTitle() {
 		const path = window.location.pathname
 
 		if (path.startsWith("/profile/")) {
-			const username = getUsernameFromTitle()
-			const userID = getUserIDFromURL()
-
-			if (username && userID) {
-				let newTitle = `${username} (${userID})`
-
-				if (!document.title.includes(`(${userID})`)) {
-					document.title = newTitle
-				}
-			}
+			extractFromProfilePage()
 		} else if (path.startsWith("/games/")) {
-			const gameID = getGameInfoFromURL()
-
-			if (gameID) {
-				const title = document.title
-				const gameTitle = title.split(" - ")[0].trim()
-
-				if (!document.title.includes(`(${gameID})`)) {
-					document.title = `${gameTitle} (${gameID})`
-				}
-			} else {
-				document.title = "Games"
-			}
-		} else if (path.startsWith("/build/")) {
-			const title = document.title
-			if (path.split("/").length === 3) {
-				document.title = "Build"
-			} else {
-				const buildTitle = title.split(" - ")[0].trim()
-				document.title = buildTitle
-			}
+			extractFromGamesPage()
 		} else if (path.startsWith("/marketplace/avatar/")) {
-			const title = document.title
-			if (!title.includes("(Avatar)")) {
-				document.title = `${title.split(" - ")[0].trim()} (Avatar)`
-			}
+			extractFromMarketplacePage("Avatar")
 		} else if (path.startsWith("/marketplace/model/")) {
-			const title = document.title
-			if (!title.includes("(Model)")) {
-				document.title = `${title.split(" - ")[0].trim()} (Model)`
-			}
+			extractFromMarketplacePage("Model")
 		} else if (path.startsWith("/marketplace/")) {
-			const title = document.title
-
-			if (path.split("/").length > 3) {
-				document.title = title.split(" - ")[0].trim()
-			} else {
-				document.title = "Shop"
-			}
+			document.title = "Discontinued Utilify - Shop"
 		} else if (path.startsWith("/news/")) {
-			document.title = "News"
+			document.title = "Discontinued Utilify - News"
 		} else if (path.startsWith("/leaderboard/")) {
-			document.title = "Leaderboard"
+			document.title = "Discontinued Utilify - Leaderboard"
 		} else {
-			document.title = "KoGaMa"
+			document.title = "Discontinued Utilify"
 		}
 	}
 
-	setDocumentTitle()
-
-	window.addEventListener("popstate", setDocumentTitle)
-
-	window.addEventListener("load", setDocumentTitle)
+	setDynamicTitle()
+	window.addEventListener("popstate", setDynamicTitle)
+	window.addEventListener("load", setDynamicTitle)
 })()
-
 {
     const font = document.createElement("style");
     font.innerHTML = `@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap');`;
