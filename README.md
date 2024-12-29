@@ -1,6 +1,5 @@
 <div align="center">
 
-[***DISCONTINUED***]()
 
   
 <img src="Modules/img/banner.png"> <br>
@@ -9,6 +8,8 @@
 
 <pre>
 <div align="center" style="text-align: justify;">
+<a href=""><i><b><u>DISCONTINUED</u></b></i></a>
+
 Due to a huge inactivity of KoGaMa's Community, I no longer see it worth to work on this extension.
 I also know of no active users of my extension, meaning I get no additional requests nor bug reports.
 
