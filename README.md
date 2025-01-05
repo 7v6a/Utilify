@@ -6,25 +6,6 @@
 
 </div>
 
-<pre>
-<div align="center" style="text-align: justify;">
-<a href=""><i><b><u>DISCONTINUED</u></b></i></a>
-
-Due to a huge inactivity of KoGaMa's Community, I no longer see it worth to work on this extension.
-I also know of no active users of my extension, meaning I get no additional requests nor bug reports.
-
-Thank you to everybody who supported and used it. I will move on to bigger and more advanced projects from now on. :)
-
-The function to check for updates will be deleted in that final version to prevent overloading any sort of ToS.
-
-I love you! - Simon.
-In case you want to contact me, my Discord ID is: 970332627221504081.
-You can also find me on GitHub at <a href="https://github.com/adouco"><b><u>github.com/adouco</u></b></a>.
-</div>
-</pre>
-
-
-
 <h2>About Utilify</h2>
 <p>
 Utilify is a addon written in javascript that hopes to make features of KoGaMaBuddy as accessible as only possible to the general public.<br>
@@ -36,7 +17,7 @@ On top of porting KoGaMaBuddy's features it also adds countless new and never-se
 
 > [!TIP]
 > Looking for suppor regarding Utilify? Trying to suggest a new feature? <br>
-> Feel welcome to add me on discord @ [ctaah](https://www.kogama.com/profile/17769289/)
+> Feel welcome to add me on discord @ [absurd](https://www.kogama.com/profile/17769289/)
 
 
 > [!NOTE]
