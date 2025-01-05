@@ -1,56 +1,90 @@
-<div align="center">
+# Utilify
+
+> A robust Tampermonkey script for KoGaMa enthusiasts, built on the legacy of KoGaMaBuddy and shaped by its users.  
+
+---
+
+## 🔧 Features at a Glance
+
+| Feature                   | Description                                                                 |
+|---------------------------|-----------------------------------------------------------------------------|
+| **KoGaMaBuddy Favorites** | Revisit classic tools and functionalities with improved performance.        |
+| **Community-Driven Updates** | Features are added based on your requests and feedback.                     |
+| **Streamlined Design**    | Built for efficiency, ensuring smooth integration with KoGaMa.             |
+
+> **Tip:** Stay updated with the latest version of Utilify to enjoy new features and improvements as they’re released.
+
+---
+
+## 🚀 Getting Started
+
+Utilify runs on **Tampermonkey**, a browser extension that allows custom scripts to enhance your web experience.
+
+### Installation Steps:
+1. Install **Tampermonkey** on your browser:
+   [🔗 Official Tampermonkey Website](https://www.tampermonkey.net/)
+2. Add the Utilify script to your Tampermonkey dashboard.
+3. Enable the script and refresh KoGaMa.
+
+| Browser Compatibility |
+|------------------------|
+| ![✔️] Chrome           |
+| ![✔️] Firefox          |
+| ![✔️] Edge             |
+| ![❓] Other browsers   |
+
+> **Note:** Tampermonkey is highly recommended. While other script managers may work, compatibility is not guaranteed.
+
+---
+
+## ⚠️ Important Notes
+
+Utilify modifies KoGaMa’s interface and functionality. While designed to enhance your experience, this approach comes with inherent risks:
+
+| Risk                     | Description                                                                 |
+|--------------------------|-----------------------------------------------------------------------------|
+| **Account Suspension**   | Scripts like Utilify may violate KoGaMa’s terms of service.                |
+| **Unexpected Behavior**  | Bugs or conflicts could occur when using third-party scripts.              |
+| **Responsibility**       | By using Utilify, you accept the risks and consequences of third-party tools.|
+
+**Proceed with caution and use responsibly.**  
+
+---
+
+## 🤝 Credits
+
+Utilify is the result of collaboration and dedication. Special thanks to:
+
+| Contributor | Role                                                                                     |
+|-------------|------------------------------------------------------------------------------------------|
+| **Snowy**   | Feature Suggestions & Testing                                                                       |
+| **Sorry**   | Concept & Design                                                                     |
+| **Raptor**  | Concept & Testing                                                                         |
+| **Flavius** | Debugging & Testing                                                                      |
+| **Tuna**    | Feature Suggestions                                                                      |
+| **Devork**  | Original code-base for UserBackgrounds                                                                       |
+| **Idealism**| Feature Suggestions                                                                      |
+
+> Your contributions and ideas make Utilify what it is today. Thank you for being part of this journey.
+
+---
+
+## 📌 Feedback & Support
+
+Utilify thrives on community input. If you encounter an issue, have a suggestion, or just want to share feedback, feel free to reach out.
+
+Together, we can make Utilify even better.
+
+---
+## 📬 Contact
+
+For feedback, suggestions, or inquiries, you can reach out here:  
+
+- **GitHub**: You're already here, bozo! 
+- **Discord**: @[simonvhs](970332627221504081)
+- **Spotify**: @[absurdic](https://open.spotify.com/user/31br6oawjyxgbxfqld4xotshfr5u)
+- **Steam**: @[absurdic](https://steamcommunity.com/id/absurdic/)
 
 
-  
-<img src="Modules/img/banner.png"> <br>
-
-</div>
-
-<h2>About Utilify</h2>
-<p>
-Utilify is a addon written in javascript that hopes to make features of KoGaMaBuddy as accessible as only possible to the general public.<br>
-On top of porting KoGaMaBuddy's features it also adds countless new and never-seen before adjustments to boost your experience.
-</p>
 
 
-<br>
-
-> [!TIP]
-> Looking for suppor regarding Utilify? Trying to suggest a new feature? <br>
-> Feel welcome to add me on discord @ [absurd](https://www.kogama.com/profile/17769289/)
-
-
-> [!NOTE]
-> <h2>Utilify Contributors</h2>
-> <p>
-> I want to give <b>huge</b> thank you to everybody who has supported the project since it's beginning as well as helped finding bugs and solutions.<br>
-> Not only that but so many people have provided me with ideas what to add and tweak for the best results.<br>
-> </b>Seriously, thanks to each single one of you.<br> 
-> <i>I love you.</i><br>
-> <b> Awoi </b>, <b>Sorry</b>, <b>Raptor</b>, <b>Flavius</b>, <b>Tuna</b>, <b>Snowy</b>, <b>Idealism</b> and <b>Devorkk</b><br><br>
-> <i> All of you are wonderful</i>
-  
-</p>
-
-<br><br>
-> [!CAUTION]
-> <h2>Important Information</h2>
-> <p>
-> This script requires a userscript manager like Tampermonkey to function properly. <br>
-> Please note that scripts executed through userscript managers may not be trusted, and it's your responsibility to ensure the safety and legitimacy of the scripts you run. 
-> If you choose to proceed, make sure to review the code and understand what it does. 
-> You can install Tampermonkey from the link below:
-> </p>
-> 
-> [<img src="Modules/img/tmonk.png" width="260"/>](https://www.tampermonkey.net/) 
-> <br><br>
->
-
-> [!IMPORTANT]  
-> <h2> Features & Installation</h2>
-> 
-> Please remember to stay safe and absolutely never try scripts that you don't understand or don't know origin of.<br>
-> The only <b>safe place</b> to actually get Utilify from is only <a href="https://github.com/unreallain/Utilify/">this github respository</a>.<br>
-> Never trust optional sources if you value your privacy.<br>
-> [<img src="Modules/img/features.png" width="200"/>](https://github.com/grimbbg/Utilify/blob/main/Modules/README.md) <br>
-> [<img src="Modules/img/download.png" width="200"/>](https://github.com/unreallain/Utilify/raw/main/Script/Utilify.user.js) 
