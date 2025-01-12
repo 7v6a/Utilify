@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         [ DISCONTINUED ] Utilify: KoGaMa
-// @namespace    discord.gg/C2ZJCZXKTu
-// @version      4.3
+// @name         Utiilify
+// @namespace    Should be discontinued but there's a friend that I care about, lol.
+// @version      4.4
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
-// @author       ⛧ Simon
+// @author       Dork (Simon)
 // @match        *://www.kogama.com/*
 // @grant        GM_setClipboard
 // @grant        GM.xmlHttpRequest
@@ -17,45 +17,39 @@
 // ==/UserScript==
 
 
-
-// Due to a huge inactivity of KoGaMa's Community I no longer see it worth to work on this extension.
-// I also know of no active users of my extension, meaning I get no additionl requests nor bug reports.
-// Thank you for everybody who supported and used it, I will move on to bigger and more advanced projects from now on. :)
-// Function to check for updates will be deleted in that final version to prevent overloading any sort of ToS.
-// I love you! - Simon.
-// In case you want to contact me, my discord ID is: 970332627221504081
-// You can also find me on github @ github.com/adouco
-
-
 (function() {
     'use strict';
     const regexPattern = /(https?:\/\/(?:www\.)?(?:kogama\.com\.br|friends\.kogama\.com|www\.kogama\.com)\/profile\/\d+\/|https?:\/\/(?:www\.)?(?:kogama\.com\.br|friends\.kogama\.com|www\.kogama\.com)\/profile\/[A-Z]+UID\/)/g;
-    function fetchUserTitle(url) {
-        return new Promise((resolve, reject) => {
-            GM.xmlHttpRequest({
-                method: 'GET',
-                url: url,
-                onload: function(response) {
-                    if (response.status === 200) {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(response.responseText, 'text/html');
-                        const title = doc.querySelector('title') ? doc.querySelector('title').innerText : 'No title';
-                        const cleanedTitle = cleanTitle(title);
-                        resolve({ url, title: cleanedTitle });
-                    } else {
-                        reject(`Error fetching ${url}: ${response.statusText}`);
-                    }
-                },
-                onerror: function(error) {
-                    reject(`Error fetching ${url}: ${error}`);
-                }
-            });
-        });
-    }
-    function cleanTitle(fullTitle) {
-        const cleaned = fullTitle.replace(/ - KoGaMa.*$/, '').trim();
-        return cleaned;
-    }
+function fetchUserTitle(url) {
+    return new Promise((resolve, reject) => {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+
+        iframe.onload = function() {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                const divElement = doc.querySelector('div._2IqY6');
+                const h1Element = divElement ? divElement.querySelector('h1') : null;
+                const title = h1Element ? h1Element.innerText : 'No title';
+                resolve({ url, title });
+            } catch (error) {
+                reject(`Error fetching ${url}: ${error}`);
+            } finally {
+                iframe.remove();
+            }
+        };
+
+        iframe.onerror = function() {
+            reject(`Failed to load iframe for ${url}`);
+            iframe.remove();
+        };
+
+        document.body.appendChild(iframe);
+    });
+}
+
+
     async function replaceUrls() {
         const foundUrls = new Set();
         const bodyText = document.body.innerText;
@@ -123,8 +117,8 @@
         setInterval(replaceUrls, 5000);
     }
     startContinuousScan();
-})()
-; // this snippet is responsible for viewing the title of games that are being built / played by people on your friendslist.
+})();
+
 (function() {
     'use strict';
 
@@ -164,13 +158,13 @@
         const url = `https://www.kogama.com/user/${userId}/friend/chat/`;
 
 fetch(url)
-    .then(response => response.text()) // Get the response as text
+    .then(response => response.text())
     .then(text => {
         let data;
         try {
-            data = JSON.parse(text); // Try parsing the text as JSON
+            data = JSON.parse(text);
         } catch (e) {
-            data = {}; // If it fails, set data to an empty object (or handle it however you like)
+            data = {}; // if failure then set the array to empty and hope for the best
         }
 
         if (data.data && Array.isArray(data.data)) {
@@ -251,12 +245,134 @@ fetch(url)
 
     function startRescanning() {
         logUserId();
-//        setInterval(logUserId, 7000);
+
     }
 
     DOMReady(() => {
         startRescanning();
     });
+})()
+;
+(async function () {
+    'use strict';
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+    async function modifyTitle() {
+        await delay(1111);
+        const path = window.location.pathname;
+        if (path.startsWith('/build')) {
+            if (path === '/build/') {
+                document.title = 'Build';
+                return;
+            } else {
+                const projectMatch = path.match(/\/build\/\d+\/project\/(\d+)\//);
+                if (projectMatch) {
+                    const projectId = projectMatch[1];
+                    const h2Element = document.querySelector('div._2o7FU > h2');
+                    if (!h2Element) return;
+                    const projectName = h2Element.textContent.trim();
+                    document.title = `(p-${projectId}) ${projectName}`;
+                    return;
+                }
+            }
+            return;
+        }
+        if (path.startsWith('/games')) {
+            if (path === '/games/') {
+                document.title = 'Community Games';
+                return;
+            } else if (path.startsWith('/games/play/')) {
+                const gameMatch = path.match(/\/games\/play\/(\d+)\//);
+                if (gameMatch) {
+                    const gameId = gameMatch[1];
+                    const h1Element = document.querySelector('h1');
+                    if (!h1Element) return;
+                    const gameName = h1Element.textContent.trim();
+                    document.title = `(g-${gameId}) ${gameName}`;
+                    return;
+                }
+            }
+            return;
+        }
+        if (path.startsWith('/marketplace')) {
+            if (path === '/marketplace/') {
+                document.title = 'Global Market';
+                return;
+            } else if (path.startsWith('/marketplace/model/')) {
+                const itemMatch = path.match(/\/marketplace\/model\/(i-\d+)\//);
+                if (itemMatch) {
+                    const itemId = itemMatch[1];
+                    const h1Element = document.querySelector('h1._3MKgJ[itemprop="name"]');
+                    if (!h1Element) return;
+                    const itemName = h1Element.textContent.trim();
+                    document.title = `(${itemId}) ${itemName}`;
+                    return;
+                }
+                document.title = 'Model Market';
+                return;
+            } else if (path.startsWith('/marketplace/avatar/')) {
+                const avatarMatch = path.match(/\/marketplace\/avatar\/(a-\d+)\//);
+                if (avatarMatch) {
+                    const avatarId = avatarMatch[1];
+                    const h1Element = document.querySelector('h1._3MKgJ[itemprop="name"]');
+                    if (!h1Element) return;
+                    const avatarName = h1Element.textContent.trim();
+                    document.title = `(${avatarId}) ${avatarName}`;
+                    return;
+                }
+                document.title = 'Avatar Market';
+                return;
+            }
+            return;
+        }
+        const profileMatch = path.match(/\/profile\/(\d+)(\/([^/]+))?/);
+        if (profileMatch) {
+            const userId = profileMatch[1];
+            const subdomain = profileMatch[3];
+            let username = '';
+            let newTitle = '';
+
+            if (!subdomain) {
+                const h1Element = document.querySelector('div._2IqY6 > h1');
+                if (h1Element) {
+                    username = h1Element.textContent.trim();
+                } else {
+                    const h1Link = document.querySelector('div._2IqY6 > h1 a');
+                    if (h1Link) {
+                        username = h1Link.textContent.trim();
+                    }
+                }
+                if (username) {
+                    document.title = `(${userId}) ${username}`;
+                    return;
+                }
+            } else {
+                const breadcrumbSpan = document.querySelector('li.MuiBreadcrumbs-li span');
+                if (!breadcrumbSpan) return;
+                username = breadcrumbSpan.textContent.trim();
+
+                switch (subdomain) {
+                    case 'avatars':
+                        newTitle = `(${userId}) ${username}'s avatars`;
+                        break;
+                    case 'games':
+                        newTitle = `(${userId}) ${username}'s games`;
+                        break;
+                    case 'marketplace':
+                        newTitle = `(${userId}) ${username}'s market`;
+                        break;
+                    case 'friends':
+                        newTitle = `(${userId}) ${username}'s friends`;
+                        break;
+                    default:
+                        return;
+                }
+
+                document.title = newTitle;
+                return;
+            }
+        }
+    }
+    await modifyTitle();
 })()
 ;
 // this code is a self-recovery function to handle clearing localstorage by user lol
@@ -408,7 +524,8 @@ fetch(url)
         setTimeout(() => notification.remove(), 4500);
     }
     function createMenu() {
-        if (!window.location.href.match(/^https:\/\/www\.kogama\.com\/build\//)) return;
+        if (window.location.href !== 'https://www.kogama.com/build/') return;
+
         const menuContainer = $('<div>', { class: 'r8y7t-j' })
             .css({
                 position: 'fixed',
@@ -743,115 +860,6 @@ fetch(url)
     setTimeout(addLoginButtonToNavbar, 1000);
 })()
 ;
-(function () {
-    'use strict';
-    function formatTimestamp(timestamp) {
-        const date = new Date(timestamp);
-        const options = {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZoneName: 'short'
-        };
-        return date.toLocaleString('en-GB', options);
-    }
-    function processComments(comments) {
-        const commentElements = document.querySelectorAll('.MuiPaper-root.MuiPaper-outlined.MuiPaper-rounded');
-
-        commentElements.forEach((element) => {
-            if (element.getAttribute('data-timestamp-appended')) return;
-
-            const usernameElement = element.querySelector('.MuiTypography-root.MuiLink-root');
-            const commentContentElement = element.querySelector('._23o8J');
-
-            if (usernameElement && commentContentElement) {
-                const username = usernameElement.innerText;
-                const commentContent = commentContentElement.innerText;
-
-                const comment = comments.find(item =>
-                    item.profile_username === username && JSON.parse(item._data).data === commentContent
-                );
-
-                if (comment) {
-                    const timestamp = formatTimestamp(comment.created);
-                    const infoDiv = document.createElement('div');
-                    infoDiv.innerText = `Created: ${timestamp}`;
-                    infoDiv.style.color = 'gray';
-                    infoDiv.style.fontSize = 'small';
-                    infoDiv.style.marginTop = '4px';
-                    element.appendChild(infoDiv);
-                    element.setAttribute('data-timestamp-appended', 'true');
-                }
-            }
-        });
-    }
-    function toAbsoluteURL(url) {
-        try {
-            return new URL(url, window.location.origin).href;
-        } catch (e) {
-            console.error("Invalid URL: ", url);
-            return null;
-        }
-    }
-    function monitorNetworkRequests() {
-        const originalFetch = window.fetch;
-        window.fetch = async function (...args) {
-            const absoluteURL = toAbsoluteURL(args[0]);
-            const response = await originalFetch.apply(this, [absoluteURL, ...args.slice(1)]);
-            if (/\/comment\/\?/.test(absoluteURL)) {
-                const url = new URL(absoluteURL);
-                if ((url.pathname.includes("/game/") || url.pathname.includes("/feed/")) && url.searchParams.get('count')) {
-                    response.clone().json().then(data => {
-                        if (data && Array.isArray(data.data)) {
-                            processComments(data.data);
-                        }
-                    });
-                }
-            }
-
-            return response;
-        };
-        const originalXhrOpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function (method, url, ...rest) {
-            const absoluteURL = toAbsoluteURL(url);
-
-            this.addEventListener('load', function () {
-                if (/\/comment\/\?/.test(absoluteURL)) {
-                    const urlObj = new URL(absoluteURL);
-                    if ((urlObj.pathname.includes("/game/") || urlObj.pathname.includes("/feed/")) && urlObj.searchParams.get('count')) {
-                        try {
-                            const response = JSON.parse(this.responseText);
-                            if (response && Array.isArray(response.data)) {
-                                processComments(response.data);
-                            }
-                        } catch (error) {
-                            console.error("Error parsing comment data:", error);
-                        }
-                    }
-                }
-            });
-
-            return originalXhrOpen.apply(this, [method, absoluteURL, ...rest]);
-        };
-    }
-    function startCommentObserver() {
-        setInterval(() => {
-            const commentElements = document.querySelectorAll('.MuiPaper-root.MuiPaper-outlined.MuiPaper-rounded');
-            commentElements.forEach((element) => {
-                if (!element.getAttribute('data-timestamp-appended')) {
-                }
-            });
-        }, 1500);
-    }
-    window.addEventListener('load', () => {
-        monitorNetworkRequests();
-        startCommentObserver();
-    });
-
-})()
-;
 (function() {
     const patterns = {
         bold: /\*\*(.*?)\*\*/g,
@@ -937,6 +945,7 @@ fetch(url)
             ul, ol {
                 padding-left: 20px;
             }
+            .tRx6U { display: none !important; }
         `;
         document.head.appendChild(style);
     }
@@ -3862,7 +3871,6 @@ GM_addStyle(`
 })()
 ;(function () {
     "use strict";
-
     function randomString(length) {
         return Math.random().toString(36).substring(2, length + 2);
     }
@@ -3886,14 +3894,14 @@ GM_addStyle(`
                 const customButton = document.createElement("div");
                 customButton.classList.add("btn-" + randomString(8));
                 customButton.style.position = "absolute";
-                customButton.style.top = "2px";
-                customButton.style.right = "-5px";
+                customButton.style.top = "5px";
+                customButton.style.right = "-10px";
                 customButton.style.zIndex = "10000";
                 customButton.style.background = "transparent";
                 customButton.style.pointerEvents = "auto";
                 customButton.style.cursor = "pointer";
-                customButton.style.width = "40px";
-                customButton.style.height = "40px";
+                customButton.style.width = "50px";
+                customButton.style.height = "50px";
                 customButton.style.display = "flex";
                 customButton.style.alignItems = "center";
                 customButton.style.justifyContent = "center";
@@ -4413,60 +4421,6 @@ GM_addStyle(`
 	}
 })()
 
-;(function () {
-	"use strict"
-
-function extractFromProfilePage() {
-    const usernameElement = document.querySelector("._2IqY6 h1 a"); // Selects the <a> inside <h1>
-    const userIDMatch = window.location.pathname.match(/\/profile\/([^/]+)\//);
-    const username = usernameElement ? usernameElement.textContent.trim() : "Unknown";
-    const userID = userIDMatch ? userIDMatch[1] : "N/A";
-    if (username && userID) {
-        document.title = `Discontinued Utilify - ${username} (${userID})`;
-    }
-}
-
-
-	function extractFromGamesPage() {
-		const gameTitleElement = document.querySelector(".game-title") // Update selector
-		const gameIDMatch = window.location.pathname.match(/\/games\/play\/([^/]+)\//)
-		const gameTitle = gameTitleElement ? gameTitleElement.innerText : "Game"
-		const gameID = gameIDMatch ? gameIDMatch[1] : "Unknown"
-		document.title = `Discontinued Utilify - ${gameTitle} (${gameID})`
-	}
-
-	function extractFromMarketplacePage(type) {
-		const titleElement = document.querySelector(".marketplace-title") // Update selector
-		const title = titleElement ? titleElement.innerText.trim() : "Marketplace"
-		document.title = `Discontinued Utilify - ${title} (${type})`
-	}
-
-	function setDynamicTitle() {
-		const path = window.location.pathname
-
-		if (path.startsWith("/profile/")) {
-			extractFromProfilePage()
-		} else if (path.startsWith("/games/")) {
-			extractFromGamesPage()
-		} else if (path.startsWith("/marketplace/avatar/")) {
-			extractFromMarketplacePage("Avatar")
-		} else if (path.startsWith("/marketplace/model/")) {
-			extractFromMarketplacePage("Model")
-		} else if (path.startsWith("/marketplace/")) {
-			document.title = "Discontinued Utilify - Shop"
-		} else if (path.startsWith("/news/")) {
-			document.title = "Discontinued Utilify - News"
-		} else if (path.startsWith("/leaderboard/")) {
-			document.title = "Discontinued Utilify - Leaderboard"
-		} else {
-			document.title = "Discontinued Utilify"
-		}
-	}
-
-	setDynamicTitle()
-	window.addEventListener("popstate", setDynamicTitle)
-	window.addEventListener("load", setDynamicTitle)
-})()
 {
     const font = document.createElement("style");
     font.innerHTML = `@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap');`;
@@ -4965,15 +4919,10 @@ function applyHazeEffect() {
 
     InsertBeforeLoad();
 })()
-;(function() {
+;(function () {
     'use strict';
     function hideMenuItems() {
-        const menuItemsToHide = [
-            '/news/',
-            '/leaderboard/',
-            '/subscription/subscribe/',
-            '/purchase/'
-        ];
+        const menuItemsToHide = ['/news/', '/leaderboard/', '/subscription/subscribe/', '/purchase/'];
         const menuLinks = document.querySelectorAll('a.MuiTypography-root');
 
         menuLinks.forEach(link => {
@@ -4984,10 +4933,35 @@ function applyHazeEffect() {
                 }
             }
         });
+        const levelItem = Array.from(menuLinks).find(link => {
+            const href = link.getAttribute('href');
+            return href && href.includes('/levels/');
+        });
+        if (levelItem) {
+            const parentLi = levelItem.closest('li');
+            if (parentLi) {
+                parentLi.style.display = 'none';
+            }
+        }
+        const goldCubeItem = document.querySelector('li._3WhKY._18cmu');
+        if (goldCubeItem) {
+            goldCubeItem.style.display = 'none';
+        }
+        const buttonItem = document.querySelector('li._3WhKY button.MuiIconButton-root');
+        if (buttonItem) {
+            GM_addStyle(`
+                li._3WhKY button.MuiIconButton-root {
+                    position: relative;
+                    left: -3px;
+                    top: 3px;
+                }
+            `);
+        }
     }
+
     window.addEventListener('load', hideMenuItems);
 
-})()
+})();
 const injectCss = (id, css) => {
 	const style = document.createElement("style")
 	style.id = id
