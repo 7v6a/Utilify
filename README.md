@@ -23,7 +23,7 @@ Utilify runs on **Tampermonkey**, a browser extension that allows custom scripts
 ### Installation Steps:
 1. Install **Tampermonkey** on your browser:
    [🔗 Official Tampermonkey Website](https://www.tampermonkey.net/)
-2. Add the Utilify script to your Tampermonkey dashboard.
+2. Add the Utilify script to your Tampermonkey dashboard. |  [***⭐ Quick Installation***](https://github.com/archfrajer/Utilify/raw/refs/heads/main/Script/Utilify.user.js)  
 3. Enable the script and refresh KoGaMa.
 
 | Browser Compatibility |
@@ -85,6 +85,7 @@ For feedback, suggestions, or inquiries, you can reach out here:
 - **Spotify**: @[absurdic](https://open.spotify.com/user/31br6oawjyxgbxfqld4xotshfr5u)
 - **Steam**: @[absurdic](https://steamcommunity.com/id/absurdic/)
 
-
+- - - 
+## ⭐ Quick Installation
 
 
