@@ -85,7 +85,6 @@ For feedback, suggestions, or inquiries, you can reach out here:
 - **Spotify**: @[absurdic](https://open.spotify.com/user/31br6oawjyxgbxfqld4xotshfr5u)
 - **Steam**: @[absurdic](https://steamcommunity.com/id/absurdic/)
 
-- - - 
-## ⭐ Quick Installation
+
 
 
