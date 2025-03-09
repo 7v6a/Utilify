@@ -81,9 +81,9 @@ Together, we can make Utilify even better.
 For feedback, suggestions, or inquiries, you can reach out here:  
 
 - **GitHub**: You're already here, bozo! 
-- **Discord**: @[simonvhs](970332627221504081)
-- **Spotify**: @[absurdic](https://open.spotify.com/user/31br6oawjyxgbxfqld4xotshfr5u)
-- **Steam**: @[absurdic](https://steamcommunity.com/id/absurdic/)
+- **Discord**: @[ffckyouwell](970332627221504081)
+- **Spotify**: @[Perle](https://open.spotify.com/user/31br6oawjyxgbxfqld4xotshfr5u)
+- **Steam**: @[Perle](https://steamcommunity.com/id/ffckyouwell/)
 
 
 
