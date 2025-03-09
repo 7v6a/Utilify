@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Utiilify
 // @namespace    discord/@simonvhs
-// @version      4.6
+// @version      4.6.3
 // @description  KoGaMa Utility script that aims to port as much KoGaBuddy features as possible alongside adding my own.
 // @author       Simon
 // @match        *://www.kogama.com/*
@@ -5935,7 +5935,7 @@ const injectCss = (id, css) => {
       const DESCRIPTION_TEXT = DESCRIPTION_ELEMENT.textContent;
       const USERNAME_ELEMENT = await waitForElement("div._2IqY6 > h1");
 
-      const BANNER_REGEXP = /banner:\s*"([^"]+)",\s*#([0-9a-fA-F]{6});/i;
+      const BANNER_REGEXP = /banner:\s*['"]([^'"]+)['"],\s*#([0-9a-fA-F]{6});/i;
       const match = BANNER_REGEXP.exec(DESCRIPTION_TEXT);
 
       if (match && typeof match == "object") {
@@ -5965,10 +5965,10 @@ const injectCss = (id, css) => {
         subtitleElement.appendChild(lineElement);
         subtitleElement.appendChild(subtitleTextElement);
 
-        USERNAME_ELEMENT.parentElement.insertBefore(
-          subtitleElement,
-          USERNAME_ELEMENT.nextSibling
-        );
+        const parentElement = USERNAME_ELEMENT.closest('div._2IqY6'); // Ensures it finds the correct parent
+        if (parentElement) {
+          parentElement.insertBefore(subtitleElement, USERNAME_ELEMENT.nextSibling);
+        }
       }
     } catch (error) {
       console.error("Error:", error.message);
@@ -5977,6 +5977,7 @@ const injectCss = (id, css) => {
 
   InsertBanner();
 })();
+
 
 GM_addStyle(`
             .checkbox-container {
