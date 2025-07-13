@@ -19,7 +19,7 @@ This version is a **full rewrite**, aiming for improved performance, maintainabi
 1. Install [Tampermonkey](https://www.tampermonkey.net/) for your browser.
 2. Click the link below to install the userscript:
 
-👉 [Install Utilify (Rewrite)](https://raw.githubusercontent.com/7v6a/Utilify/refs/heads/main/Script/Rewrite/Utilify.js)
+👉 [Install Utilify (Rewrite)](https://raw.githubusercontent.com/7v6a/Utilify/refs/heads/main/Script/Rewrite/Utilify.user.js)
 
 ---
 
