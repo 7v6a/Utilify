@@ -1,15 +1,19 @@
 // ==UserScript==
-// @name         UtilifyV2 [ WWW ] 
+// @name         UtilifyV2
 // @namespace    dsc.gg/C2ZJCZXKTu
-// @version      2.0.0
-// @description  A miserable shot at rewriting Utilify. Currently buggy & lacking in features.
+// @version      2.0.1
+// @description  Slowly rewriting this addon because I want to feel useful.
 // @author       S
 // @match        *://www.kogama.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=kogama.com
+// @icon         https://avatars.githubusercontent.com/u/143356794?v=4
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
+// @grant        GM_setClipboard
 // @connect      fonts.googleapis.com
+// @connect      kogama.com
+// @connect      kogama.com.br
 // ==/UserScript==
 
 (async function() { // profile backgrounds - KoGaMaBuddy Enhanced
@@ -227,8 +231,10 @@ async function applyEffects() {
         (m[2] || '').split(',').map(f => f.trim()).filter(Boolean).forEach(f => {
             if (effects[f]) effects[f](b, i);
         });
-    } catch (e) { console.error(e); }
+    } catch (e) {
+    }
 }
+
 
 async function fetchImage(id) {
     const r = await fetch(`https://www.kogama.com/games/play/${id}/`);
@@ -247,12 +253,20 @@ document.readyState === 'loading'
 
     (async()=>{
     try{
-    const d=await wait("div._9smi2 > div.MuiPaper-root._1rJI8.MuiPaper-rounded > div._1aUa_");
-    const u=await wait("div._2IqY6 > h1");
+    const d=await wait("[itemprop='description'], div._1aUa_");
     const txt=d.textContent;
 
-    // Banner
-    const m=/(?:banner:\s*['"]([^'"]+)['"],\s*#([0-9a-f]{6});)/i.exec(txt);
+    let u = document.querySelector("div._2IqY6 > h1");
+    if (!u) u = document.querySelector("div._1wqQ3 > h1");
+    if (!u) u = document.querySelector("h1");
+
+    if (!u) {
+        console.log("Username element not found");
+        return;
+    }
+
+    // Regex to make these stupid banners work with different qoute styles cause I'm gonna crashout soon I swear I promise :3
+    const m=/(?:banner:\s*['"“”]([^'"“”]+(?:'[^'"“”]*)*)['"“”],\s*#([0-9a-f]{6});)/i.exec(txt);
     if(m){
         const b=document.createElement("div");
         b.style.cssText="display:flex;align-items:center;margin:1px 0 10px";
@@ -262,14 +276,15 @@ document.readyState === 'loading'
         l.style.cssText=`color:#${m[2]};font-size:.75em;display:inline-block;margin-right:5px`;
 
         const t=document.createElement("div");
-        t.textContent=m[1];
+        t.textContent=m[1].replace(/^['"“”]|['"“”]$/g, ''); // Remove any remaining quotes
         t.style.cssText=`color:#${m[2]};text-shadow:2px 2px 4px rgba(0,0,0,0.3);font-weight:600;font-size:.75em`;
 
         b.append(l,t);
-        u.closest('div._2IqY6')?.insertBefore(b,u.nextSibling);
+        const headerContainer = u.closest('div._2IqY6') || u.closest('div._1wqQ3') || u.parentElement;
+        if (headerContainer) {
+            headerContainer.insertBefore(b, u.nextSibling);
+        }
     }
-
-    // global Linear gradient
     const g=/(?:linear-gradient\((?:\d+deg, )?(#[0-9a-f]{6}, #[0-9a-f]{6}(?: \d+%)?)\))/i.exec(txt);
     if(g){
         const el=document.querySelector('#root-page-mobile');
@@ -407,7 +422,8 @@ document.readyState === 'loading'
         if (!script) return false;
 
         try {
-            const {object: {created, last_ping}} = JSON.parse(script.textContent.match(/options\.bootstrap = (\{.*?\});/s)[1]);
+            const bootstrap = JSON.parse(script.textContent.match(/options\.bootstrap = (\{.*?\});/s)[1]);
+            const {object: {created, last_ping}} = bootstrap;
             const gameInfo = JSON.parse(localStorage.getItem('__amplify__cache:game:last-played') || '{}')?.data;
             const formatCompactDate = d => new Date(d).toLocaleDateString([], {month: 'short', day: 'numeric', year: 'numeric'});
 
@@ -430,6 +446,7 @@ document.readyState === 'loading'
                 }
                 return 'now';
             };
+
             const createToggleInfo = (icon, compact, full) => {
                 const container = document.createElement('div');
                 container.style.cssText = `
@@ -478,6 +495,7 @@ document.readyState === 'loading'
 
                 return container;
             };
+
             const wrapper = document.createElement('div');
             wrapper.style.cssText = `
                 display: flex;
@@ -491,7 +509,7 @@ document.readyState === 'loading'
             wrapper.appendChild(createToggleInfo('📅', formatCompactDate(created), formatVerbose(created)));
             wrapper.appendChild(createToggleInfo('👁️', timeAgo(last_ping), formatVerbose(last_ping)));
 
-            if (gameInfo?.id) {
+            if (bootstrap.object?.is_me && gameInfo?.id) {
                 const game = document.createElement('a');
                 game.href = `https://www.kogama.com/games/play/${gameInfo.id}/`;
                 game.textContent = '🎮 ' + (gameInfo.name.length > 15 ? gameInfo.name.substring(0, 15) + '...' : gameInfo.name);
@@ -502,6 +520,7 @@ document.readyState === 'loading'
                     text-decoration: none;
                     white-space: nowrap;
                 `;
+                game.title = gameInfo.name;
                 wrapper.appendChild(game);
             }
 
@@ -527,6 +546,7 @@ document.readyState === 'loading'
             return false;
         }
     };
+
     setTimeout(() => {
         if (!enhance()) {
             const observer = new MutationObserver((_, obs) => enhance() && obs.disconnect());
@@ -658,12 +678,12 @@ document.readyState === 'loading'
         if (!logoContainer) return false;
         const logoLink = logoContainer.querySelector('a[title="KoGaMa"]');
         if (logoLink) {
-            logoLink.title = "UtilifyV2 by Skull <3";
+            logoLink.title = "UtilifyV2 with <3";
             logoLink.href = "https://github.com/7v6a";
             const logoImg = logoLink.querySelector('img');
             if (logoImg) {
                 logoImg.src = "https://avatars.githubusercontent.com/u/143356794?v=4";
-                logoImg.alt = "Gargoyle powered by BruteCat";
+                logoImg.alt = "UtilifyV2 with <3";
             }
             return true;
         }
@@ -1959,4 +1979,310 @@ document.readyState === 'loading'
     } else {
         window.addEventListener('load', initialize);
     }
+})();
+
+// Avatar Finder V3: Logic by Selene
+(function() {
+  'use strict';
+
+  let modalMessage = null;
+  let modalSpinner = null;
+
+  function gmFetchJson(url) {
+    return new Promise((resolve, reject) => {
+      GM_xmlhttpRequest({
+        method: 'GET',
+        url,
+        onload: res => {
+          try { resolve(JSON.parse(res.responseText)); }
+          catch(e){ reject(e); }
+        },
+        onerror: reject
+      });
+    });
+  }
+
+  function getHost() {
+    const h = location.hostname;
+    if (h.includes('friends.kogama.com')) return 'friends.kogama.com';
+    if (h.includes('kogama.com.br')) return 'kogama.com.br';
+    return 'www.kogama.com';
+  }
+
+  function decodeEntities(str) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = str;
+    return txt.value;
+  }
+
+  function showModal(msg, spinning = false) {
+    hideModal();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'am-modal-overlay';
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      background: 'rgba(0, 0, 0, 0.4)',
+      zIndex: 10001,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backdropFilter: 'blur(2px)'
+    });
+
+    const container = document.createElement('div');
+    Object.assign(container.style, {
+      background: '#fff',
+      padding: '24px',
+      borderRadius: '10px',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      position: 'relative',
+      minWidth: '220px'
+    });
+
+    const close = document.createElement('div');
+    close.textContent = '✖';
+    Object.assign(close.style, {
+      position: 'absolute',
+      top: '10px',
+      right: '12px',
+      cursor: 'pointer',
+      fontSize: '16px',
+      color: '#999'
+    });
+    close.addEventListener('click', hideModal);
+
+    const spinner = document.createElement('div');
+    spinner.id = 'am-spinner';
+    Object.assign(spinner.style, {
+      width: '48px',
+      height: '48px',
+      border: '3px solid rgba(0,0,0,0.1)',
+      borderTop: '3px solid #3498db',
+      borderRadius: '50%',
+      animation: 'am-spin 1s linear infinite',
+      marginBottom: '16px',
+      willChange: 'transform',
+      backfaceVisibility: 'hidden'
+    });
+
+    const message = document.createElement('div');
+    message.innerHTML = msg;
+    modalMessage = message;
+    modalSpinner = spinner;
+    Object.assign(message.style, {
+      color: '#000',
+      fontSize: '14px',
+      fontFamily: 'sans-serif',
+      textAlign: 'center'
+    });
+
+    if (spinning) container.append(spinner);
+    container.append(close, message);
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes am-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function updateModalMessage(msg, success = true) {
+    if (modalMessage) {
+      modalMessage.textContent = msg;
+      if (modalSpinner && modalSpinner.parentElement) {
+        modalSpinner.remove();
+        modalSpinner = null;
+      }
+      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      icon.setAttribute("viewBox", "0 0 24 24");
+      icon.setAttribute("width", "36");
+      icon.setAttribute("height", "36");
+      icon.setAttribute("stroke", success ? "green" : "red");
+      icon.setAttribute("fill", "none");
+      icon.setAttribute("stroke-width", "2");
+      icon.setAttribute("stroke-linecap", "round");
+      icon.setAttribute("stroke-linejoin", "round");
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", success ? "M5 13l4 4L19 7" : "M18 6L6 18M6 6l12 12");
+      icon.appendChild(path);
+
+      const container = modalMessage.parentElement;
+      container.insertBefore(icon, modalMessage);
+    }
+  }
+
+  function hideModal() {
+    const e = document.getElementById('am-modal-overlay');
+    if (e) e.remove();
+    modalMessage = null;
+    modalSpinner = null;
+  }
+
+  const match = location.pathname.match(/\/profile\/(\d+)\/avatars/);
+  if (!match) return;
+  const userId = match[1], server = getHost();
+
+  let inventoryIds = [], idToName = {};
+  async function loadInventory() {
+    let page = 1, pages = 1;
+    do {
+      try {
+        const json = await gmFetchJson(`https://${server}/user/${userId}/avatar/?page=${page}&count=400`);
+        (json.data||[]).forEach(a => {
+          inventoryIds.push(a.avatar_id);
+          idToName[a.avatar_id] = a.avatar_name||'';
+        });
+        pages = (json.paging && json.paging.pages) || 1;
+      } catch(e) {
+        console.error(e);
+        showModal('Error loading avatars');
+        return;
+      }
+      page++;
+    } while(page <= pages);
+  }
+
+  async function fetchFeed(id, retries = 1) {
+    try {
+      const resp = await fetch(`https://${server}/api/feed/1/${id}`);
+      if (resp.status === 429 && retries > 0) {
+        await new Promise(r => setTimeout(r, 2000));
+        return fetchFeed(id, retries - 1);
+      }
+      if (!resp.ok) return null;
+      const j = await resp.json();
+      return j.data;
+    } catch {
+      return null;
+    }
+  }
+
+  async function findProductForAvatar(avId) {
+    showModal('Searching...', true);
+    const rawName = idToName[avId] || '';
+    const expectedName = decodeEntities(rawName);
+    let dataStr;
+    try {
+      dataStr = (await gmFetchJson(`https://${server}/model/market/a-${avId}/`)).data || '';
+    } catch(e) {
+      console.error(e);
+      updateModalMessage('Failed fetching model info', false);
+      return;
+    }
+    const sold = (dataStr.match(/sold_count=(\d+)/)||[])[1];
+    if (sold && +sold !== 0) {
+      GM_setClipboard(avId);
+      updateModalMessage(`Found! Product ID: a-${avId}`, true);
+      return;
+    }
+    const cr = dataStr.match(/created=datetime\.datetime\((\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)/);
+    if (!cr) {
+      updateModalMessage('Failed parsing creation date', false);
+      return;
+    }
+    const Y = +cr[1], Mo = +cr[2], D = +cr[3], H = +cr[4], Mi = +cr[5], S = cr[6]?+cr[6]:0;
+    const target = new Date(Date.UTC(Y, Mo-1, D, H, Mi, S));
+
+    let low = 1, high = 80000000, approx = null;
+    while (low <= high) {
+      const mid = (low + high) >> 1;
+      const f = await fetchFeed(mid);
+      if (!f || !f.created) { high = mid - 1; continue; }
+      const dt = new Date(f.created);
+      if (dt < target) low = mid + 1;
+      else if (dt > target) high = mid - 1;
+      else { approx = mid; break; }
+    }
+    if (approx === null) approx = low <= 80000000 ? low : high;
+
+    const span = 100, start = Math.max(1, approx - span), end = approx + span;
+    for (let i = start; i <= end; i++) {
+      const f = await fetchFeed(i);
+      await new Promise(r => setTimeout(r, 20));
+      if (!f || !f.created) continue;
+      if (f.profile_id == userId) {
+        try {
+          const info = JSON.parse(f._data||'{}');
+          const pn = decodeEntities(info.product_name || '');
+          if (pn === expectedName) {
+            GM_setClipboard(info.product_id.slice(2));
+            updateModalMessage(`Found via feed match! Product ID: ${info.product_id}`, true);
+            return;
+          }
+        } catch {}
+      }
+      if (f.created === target.toISOString().split('.')[0]+'+00:00') {
+        try {
+          const info = JSON.parse(f._data||'{}');
+          GM_setClipboard(info.product_id.slice(2));
+          updateModalMessage(`Found! Product ID: ${info.product_id}`, true);
+          return;
+        } catch {}
+      }
+    }
+    updateModalMessage('No matching feed entry found', false);
+  }
+
+  async function attachButtons() {
+    const items = document.querySelectorAll('.MuiGrid-root.MuiGrid-container .MuiGrid-item');
+    let pageNum = 1;
+    const active = document.querySelector('.MuiPaginationItem-page.Mui-selected, .MuiPaginationItem-root.Mui-selected');
+    if (active) pageNum = parseInt(active.textContent.trim(), 10) || 1;
+    items.forEach((el, idx) => {
+      if (el.querySelector('.am-find-overlay')) return;
+      const globalIdx = (pageNum - 1) * items.length + idx;
+      const avId = inventoryIds[globalIdx];
+      if (!avId) return;
+
+      const div = document.createElement('div');
+      div.className = 'am-find-overlay';
+      div.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>`;
+      Object.assign(div.style, {
+        position: 'absolute',
+        bottom: '6px',
+        right: '6px',
+        zIndex: 999,
+        width: '28px',
+        height: '28px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(255,255,255,0.8)',
+        border: '1px solid #ccc',
+        borderRadius: '50%',
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'transform 0.2s ease'
+      });
+      div.addEventListener('mouseenter', () => div.style.transform = 'scale(1.1)');
+      div.addEventListener('mouseleave', () => div.style.transform = 'scale(1)');
+      div.addEventListener('click', () => findProductForAvatar(avId));
+      el.style.position = 'relative';
+      el.appendChild(div);
+    });
+  }
+
+  (async () => {
+    await loadInventory();
+    attachButtons();
+    setInterval(attachButtons, 3000);
+  })();
 })();
